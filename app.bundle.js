@@ -122,6 +122,28 @@ function telefonoValido(tel) {
   const digitos = limpio.replace(/\D/g, "");
   return digitos.length >= 9;
 }
+function telefonoParaWhatsApp(tel) {
+  let digitos = (tel || "").replace(/\D/g, "");
+  if (digitos.length === 9) digitos = "34" + digitos;
+  if (digitos.startsWith("0034")) digitos = digitos.slice(2);
+  return digitos;
+}
+function enlaceWhatsApp(telefono, mensaje) {
+  const numero = telefonoParaWhatsApp(telefono);
+  return `https://wa.me/${numero}?text=${encodeURIComponent(mensaje)}`;
+}
+function enviarAvisoEmail(aviso) {
+  fetch("/api/avisar", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ aviso })
+  }).catch(() => {
+  });
+}
+function notificar(nuevo, aviso) {
+  nuevo.avisos.unshift(aviso);
+  enviarAvisoEmail(aviso);
+}
 function formatearFechaHora(ts) {
   if (!ts) return "";
   const f = new Date(ts);
@@ -299,7 +321,7 @@ function Baildanzas() {
   }, []);
   const mostrarToast = (msg) => {
     setToast(msg);
-    setTimeout(() => setToast(null), 3200);
+    setTimeout(() => setToast(null), 9600);
   };
   if (cargando || !estado) {
     return /* @__PURE__ */ React.createElement("div", { style: { background: PAL.papel }, className: "min-h-screen flex items-center justify-center" }, /* @__PURE__ */ React.createElement("div", { style: { fontFamily: FONT.display, color: PAL.tinta }, className: "text-2xl italic animate-pulse" }, "Preparando el comp\xE1s\u2026"), /* @__PURE__ */ React.createElement(FontImport, null));
@@ -325,7 +347,7 @@ function Baildanzas() {
     confirmadas.forEach((p) => nuevo.interesados[info.activityId].push({ ...p, ts: Date.now() }));
     enEspera.forEach((p) => nuevo.listaEspera[info.activityId].push({ ...p, ts: Date.now() }));
     if (confirmadas.length > 0) {
-      nuevo.avisos.unshift({
+      notificar(nuevo, {
         id: uid(),
         sedeId,
         dia: info.dia,
@@ -338,7 +360,7 @@ function Baildanzas() {
       });
     }
     if (enEspera.length > 0) {
-      nuevo.avisos.unshift({
+      notificar(nuevo, {
         id: uid(),
         sedeId,
         dia: info.dia,
@@ -374,7 +396,7 @@ function Baildanzas() {
     personas.forEach((p) => nuevo.interesados[info.activityId].push({ ...p, ts: Date.now() }));
     const despues = nuevo.interesados[info.activityId].length;
     if (antes < UMBRAL_PROPUESTA && despues >= UMBRAL_PROPUESTA) {
-      nuevo.avisos.unshift({
+      notificar(nuevo, {
         id: uid(),
         sedeId,
         dia: info.dia,
@@ -412,7 +434,7 @@ function Baildanzas() {
           personas.forEach((p) => nuevo.interesados[existente.id].push({ ...p, ts: Date.now() }));
           const despues = nuevo.interesados[existente.id].length;
           if (antes < UMBRAL_PROPUESTA && despues >= UMBRAL_PROPUESTA) {
-            nuevo.avisos.unshift({
+            notificar(nuevo, {
               id: uid(),
               sedeId,
               dia: info.dia,
@@ -428,6 +450,17 @@ function Baildanzas() {
           const nuevaPropuesta = { id: uid(), nombre: nombreActividad, sala: info.sala };
           propuestasDelHueco.push(nuevaPropuesta);
           nuevo.interesados[nuevaPropuesta.id] = personas.map((p) => ({ ...p, ts: Date.now() }));
+          notificar(nuevo, {
+            id: uid(),
+            sedeId,
+            dia: info.dia,
+            hora: info.hora,
+            nombre: nombreActividad,
+            tipo: "Nueva propuesta de actividad",
+            contactos: nuevo.interesados[nuevaPropuesta.id],
+            ts: Date.now(),
+            resuelto: false
+          });
         }
       });
     }
@@ -514,7 +547,7 @@ function Baildanzas() {
       totalInteresados = nuevo.interesados[idPropuesta].length;
     }
     if (totalInteresados >= UMBRAL_PROPUESTA) {
-      nuevo.avisos.unshift({
+      notificar(nuevo, {
         id: uid(),
         sedeId: s.sedeId,
         dia: s.dia,
@@ -597,7 +630,7 @@ function Baildanzas() {
       if (cupo == null || nuevo.interesados[activityId].length < cupo) {
         promocionado = nuevo.listaEspera[activityId].shift();
         nuevo.interesados[activityId].push({ ...promocionado, ts: Date.now() });
-        nuevo.avisos.unshift({
+        notificar(nuevo, {
           id: uid(),
           sedeId: loc.sedeId,
           dia: loc.dia,
@@ -987,7 +1020,7 @@ function FilaHora({ hora, dia, activas, propuestas, estado, onAbrirModal }) {
         style: { background: PAL.blanco, border: `1.5px dashed ${PAL.mostaza}` },
         className: "w-full text-left px-4 py-3.5 rounded-2xl flex items-center justify-between gap-2 flex-wrap hover:shadow-sm transition-shadow"
       },
-      /* @__PURE__ */ React.createElement("div", { className: "min-w-0 flex-1" }, /* @__PURE__ */ React.createElement("div", { style: { fontFamily: FONT.display }, className: "font-medium text-lg leading-tight" }, prop.nombre), /* @__PURE__ */ React.createElement("div", { style: { color: PAL.mostaza }, className: "text-sm mt-1 font-medium" }, "Propuesta de un alumno")),
+      /* @__PURE__ */ React.createElement("div", { className: "min-w-0 flex-1" }, /* @__PURE__ */ React.createElement("div", { style: { fontFamily: FONT.display }, className: "font-medium text-lg leading-tight" }, prop.nombre), /* @__PURE__ */ React.createElement("div", { style: { color: PAL.mostaza }, className: "text-sm mt-1 font-medium" }, "Propuesta del alumnado")),
       /* @__PURE__ */ React.createElement(DotsProgreso, { n })
     );
   }), sePuedeProponer && /* @__PURE__ */ React.createElement(
@@ -1028,7 +1061,7 @@ function DotsProgreso({ n }) {
 function ModalHueco({ info, estado, catalogo, onCerrar, onUnirseActiva, onUnirsePropuesta, onEnviarHueco }) {
   const [nombre, setNombre] = useState("");
   const [telefono, setTelefono] = useState("");
-  const [seleccion, setSeleccion] = useState(catalogo[0] || "");
+  const [seleccion, setSeleccion] = useState("");
   const [textoOtro, setTextoOtro] = useState("");
   const [listaActividades, setListaActividades] = useState([]);
   const [listaSugerencias, setListaSugerencias] = useState([]);
@@ -1193,6 +1226,7 @@ function ModalHueco({ info, estado, catalogo, onCerrar, onUnirseActiva, onUnirse
           style: { borderColor: PAL.linea, fontFamily: FONT.body },
           className: "flex-1 px-4 py-3 rounded-xl border bg-white text-sm outline-none"
         },
+        /* @__PURE__ */ React.createElement("option", { value: "", disabled: true }, "Elige una actividad\u2026"),
         catalogo.map((a) => /* @__PURE__ */ React.createElement("option", { key: a, value: a }, a)),
         /* @__PURE__ */ React.createElement("option", { value: "__otro__" }, "Otra actividad (proponer nueva)\u2026")
       ), /* @__PURE__ */ React.createElement(
@@ -1343,6 +1377,7 @@ function PanelGestion({
   const [resultadosBusqueda, setResultadosBusqueda] = useState(null);
   const [editando, setEditando] = useState(null);
   const [confirmandoConversion, setConfirmandoConversion] = useState(null);
+  const [fechaPrueba, setFechaPrueba] = useState("");
   const [expandidaActiva, setExpandidaActiva] = useState(null);
   const [nuevoAlumnoNombre, setNuevoAlumnoNombre] = useState("");
   const [nuevoAlumnoTelefono, setNuevoAlumnoTelefono] = useState("");
@@ -1789,10 +1824,57 @@ function PanelGestion({
           tituloQuitar: "Dar de baja de esta propuesta",
           onGuardarEdicion: (n, t) => onEditarInteresado(p.id, idx, "interesados", n, t)
         }
-      ))), confirmandoConversion === p.id ? /* @__PURE__ */ React.createElement("div", { style: { background: PAL.papel, border: `1.5px solid ${PAL.petroleo}` }, className: "rounded-xl p-3 mt-3" }, /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta }, className: "text-xs mb-2 leading-relaxed" }, "Vas a convertir ", /* @__PURE__ */ React.createElement("strong", null, '"', p.nombre, '"'), " en clase activa.", " ", p.personas.length === 0 ? "Ahora mismo no hay nadie apuntado todav\xEDa." : `${p.personas.length} persona${p.personas.length !== 1 ? "s" : ""} pasar\xE1${p.personas.length !== 1 ? "n" : ""} directamente a ser alumnado de esa clase:`), p.personas.length > 0 && /* @__PURE__ */ React.createElement("ul", { className: "mb-3 space-y-0.5" }, p.personas.map((per, i) => /* @__PURE__ */ React.createElement("li", { key: i, style: { fontFamily: FONT.mono, color: PAL.tinta, opacity: 0.7 }, className: "text-[11px]" }, "\xB7 ", per.nombre, " \u2014 ", per.telefono))), /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.5 }, className: "text-[11px] mb-3" }, "No se pierde a nadie: pasan a la lista de la clase, y adem\xE1s queda una copia en la copia de seguridad exportable."), /* @__PURE__ */ React.createElement("div", { className: "flex gap-2" }, /* @__PURE__ */ React.createElement(
+      ))), confirmandoConversion === p.id ? /* @__PURE__ */ React.createElement("div", { style: { background: PAL.papel, border: `1.5px solid ${PAL.petroleo}` }, className: "rounded-xl p-3 mt-3" }, /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta }, className: "text-xs mb-2 leading-relaxed" }, "Vas a convertir ", /* @__PURE__ */ React.createElement("strong", null, '"', p.nombre, '"'), " en clase activa.", " ", p.personas.length === 0 ? "Ahora mismo no hay nadie apuntado todav\xEDa." : `${p.personas.length} persona${p.personas.length !== 1 ? "s" : ""} pasar\xE1${p.personas.length !== 1 ? "n" : ""} directamente a ser alumnado de esa clase:`), p.personas.length > 0 && /* @__PURE__ */ React.createElement("div", { className: "mb-3" }, /* @__PURE__ */ React.createElement("label", { style: { color: PAL.tinta, opacity: 0.7 }, className: "text-[11px] block mb-1" }, "\xBFQu\xE9 d\xEDa es la clase de prueba a la que deben confirmar asistencia?"), /* @__PURE__ */ React.createElement(
+        "input",
+        {
+          type: "date",
+          value: fechaPrueba,
+          onChange: (e) => setFechaPrueba(e.target.value),
+          style: { borderColor: PAL.linea, fontFamily: FONT.body },
+          className: "w-full px-3 py-2 rounded-lg border bg-white text-xs outline-none"
+        }
+      ), !fechaPrueba && /* @__PURE__ */ React.createElement("p", { style: { color: PAL.mostaza }, className: "text-[10px] mt-1" }, "Indica la fecha para poder avisar por WhatsApp \u2014 sin ella, el bot\xF3n queda desactivado.")), p.personas.length > 0 && /* @__PURE__ */ React.createElement("ul", { className: "mb-3 space-y-1" }, p.personas.map((per, i) => {
+        const hayQuorum = p.personas.length >= UMBRAL_PROPUESTA;
+        const habilitado = hayQuorum && !!fechaPrueba;
+        const fechaFormateada = fechaPrueba ? fechaPrueba.split("-").reverse().join("/") : "";
+        const mensaje = `\xA1Hola ${per.nombre}!
+
+\xA1Enhorabuena! \u{1F389} Gracias a tu propuesta (y a la de m\xE1s compa\xF1eros), ya somos suficientes para que arranque la clase:
+
+${p.nombre} \u2014 ${p.dia} a las ${p.hora}${p.sala ? `, ${p.sala}` : ""}
+
+Tu clase de prueba ser\xE1 el ${fechaFormateada}. Por favor, conf\xEDrmanos que puedes asistir ese d\xEDa.
+
+\xA1Nos vemos en Baildanzas! \u{1F483}\u{1F389}`;
+        return /* @__PURE__ */ React.createElement("li", { key: i, className: "flex items-center justify-between gap-2" }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: FONT.mono, color: PAL.tinta, opacity: 0.7 }, className: "text-[11px]" }, "\xB7 ", per.nombre, " \u2014 ", per.telefono), habilitado ? /* @__PURE__ */ React.createElement(
+          "a",
+          {
+            href: enlaceWhatsApp(per.telefono, mensaje),
+            target: "_blank",
+            rel: "noopener noreferrer",
+            style: { background: "#25D366", color: "white" },
+            className: "text-[10px] px-2 py-1 rounded-full font-medium shrink-0 flex items-center gap-1",
+            title: "Avisar por WhatsApp"
+          },
+          /* @__PURE__ */ React.createElement(Phone, { size: 10 }),
+          " WhatsApp"
+        ) : /* @__PURE__ */ React.createElement(
+          "span",
+          {
+            style: { background: PAL.linea, color: PAL.tinta, opacity: 0.5 },
+            className: "text-[10px] px-2 py-1 rounded-full font-medium shrink-0 flex items-center gap-1 cursor-not-allowed",
+            title: !hayQuorum ? `Se habilita al llegar a ${UMBRAL_PROPUESTA} personas` : "Indica primero la fecha de la clase de prueba"
+          },
+          /* @__PURE__ */ React.createElement(Phone, { size: 10 }),
+          " WhatsApp"
+        ));
+      })), /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.5 }, className: "text-[11px] mb-3" }, "No se pierde a nadie: pasan a la lista de la clase, y adem\xE1s queda una copia en la copia de seguridad exportable."), /* @__PURE__ */ React.createElement("div", { className: "flex gap-2" }, /* @__PURE__ */ React.createElement(
         "button",
         {
-          onClick: () => setConfirmandoConversion(null),
+          onClick: () => {
+            setConfirmandoConversion(null);
+            setFechaPrueba("");
+          },
           style: { borderColor: PAL.linea, color: PAL.tinta },
           className: "flex-1 py-2 rounded-lg border text-xs font-medium"
         },
@@ -1803,6 +1885,7 @@ function PanelGestion({
           onClick: () => {
             onConvertirEnActiva(p.dia, p.hora, p.id, p.nombre, p.sala);
             setConfirmandoConversion(null);
+            setFechaPrueba("");
           },
           style: { background: PAL.petroleo },
           className: "flex-1 py-2 rounded-lg text-white text-xs font-medium"
@@ -1811,7 +1894,10 @@ function PanelGestion({
       ))) : /* @__PURE__ */ React.createElement(
         "button",
         {
-          onClick: () => setConfirmandoConversion(p.id),
+          onClick: () => {
+            setConfirmandoConversion(p.id);
+            setFechaPrueba("");
+          },
           style: {
             background: p.personas.length >= UMBRAL_PROPUESTA ? PAL.petroleo : "transparent",
             color: p.personas.length >= UMBRAL_PROPUESTA ? PAL.blanco : PAL.petroleo,
