@@ -259,20 +259,20 @@ async function cargarEstado() {
     const res = await fetch(`${SUPABASE_URL}/rest/v1/estado_app?id=eq.1&select=datos`, {
       headers: { apikey: SUPABASE_KEY }
     });
-    if (!res.ok) return null;
+    if (!res.ok) return { datos: null, error: true };
     const filas = await res.json();
     if (filas && filas[0] && filas[0].datos && Object.keys(filas[0].datos).length > 0) {
-      return filas[0].datos;
+      return { datos: filas[0].datos, error: false };
     }
-    return null;
+    return { datos: null, error: false };
   } catch (e) {
-    console.error("No se pudo leer el estado (se seguir\xE1 igualmente)", e);
-    return null;
+    console.error("No se pudo leer el estado", e);
+    return { datos: null, error: true };
   }
 }
 async function guardarEstado(estado) {
   try {
-    await fetch(`${SUPABASE_URL}/rest/v1/estado_app?id=eq.1`, {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/estado_app?id=eq.1`, {
       method: "PATCH",
       headers: {
         apikey: SUPABASE_KEY,
@@ -281,8 +281,10 @@ async function guardarEstado(estado) {
       },
       body: JSON.stringify({ datos: estado, actualizado_en: (/* @__PURE__ */ new Date()).toISOString() })
     });
+    return res.ok;
   } catch (e) {
     console.error("No se pudo guardar", e);
+    return false;
   }
 }
 function contarInteresados(estado, activityId) {
@@ -298,10 +300,11 @@ function Baildanzas() {
   const [panelGestion, setPanelGestion] = useState(false);
   const [panelDesbloqueado, setPanelDesbloqueado] = useState(false);
   const [toast, setToast] = useState(null);
+  const [errorCarga, setErrorCarga] = useState(false);
   useEffect(() => {
     (async () => {
-      const cargado = await cargarEstado();
-      const base = cargado || estadoInicial();
+      const resultado = await cargarEstado();
+      const base = resultado.datos || estadoInicial();
       if (!base.catalogoActividades) base.catalogoActividades = CATALOGO_INICIAL;
       if (!base.sugerencias) base.sugerencias = [];
       if (!base.listaEspera) base.listaEspera = {};
@@ -313,11 +316,16 @@ function Baildanzas() {
       }
       setEstado(base);
       setCargando(false);
+      if (resultado.error) setErrorCarga(true);
     })();
   }, []);
   const persistir = useCallback((nuevo) => {
     setEstado(nuevo);
-    guardarEstado(nuevo);
+    guardarEstado(nuevo).then((ok) => {
+      if (!ok) {
+        mostrarToast("\u26A0\uFE0F No se pudo guardar. Comprueba tu conexi\xF3n e int\xE9ntalo de nuevo.");
+      }
+    });
   }, []);
   const mostrarToast = (msg) => {
     setToast(msg);
@@ -812,7 +820,14 @@ function Baildanzas() {
       onMarcarPropuestasVistas: marcarPropuestasVistas,
       onExportar: exportarCopiaSeguridad
     }
-  ), toast && /* @__PURE__ */ React.createElement(Toast, { mensaje: toast }));
+  ), toast && /* @__PURE__ */ React.createElement(Toast, { mensaje: toast }), errorCarga && /* @__PURE__ */ React.createElement(
+    BannerError,
+    {
+      mensaje: "No se pudieron cargar los \xFAltimos cambios guardados. Puede que veas informaci\xF3n desactualizada.",
+      onRecargar: () => window.location.reload(),
+      onCerrar: () => setErrorCarga(false)
+    }
+  ));
 }
 var PAL = {
   papel: "#FBF3E7",
@@ -856,6 +871,7 @@ function FontImport() {
     `);
 }
 function Cabecera({ sedeId, setSedeId, sedes, avisos, onGestion }) {
+  const [mostrarComoFunciona, setMostrarComoFunciona] = useState(false);
   return /* @__PURE__ */ React.createElement("header", { style: { borderBottom: `1px solid ${PAL.linea}` }, className: "pt-8 pb-5" }, /* @__PURE__ */ React.createElement("div", { className: "max-w-2xl mx-auto px-4" }, /* @__PURE__ */ React.createElement("div", { className: "flex items-start justify-between" }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement(
     "img",
     {
@@ -870,6 +886,14 @@ function Cabecera({ sedeId, setSedeId, sedes, avisos, onGestion }) {
       className: "text-[11px] uppercase tracking-[0.18em] mt-1.5"
     },
     "Elige tu ritmo \xB7 elige tu horario"
+  ), /* @__PURE__ */ React.createElement(
+    "button",
+    {
+      onClick: () => setMostrarComoFunciona(true),
+      style: { fontFamily: FONT.body, color: PAL.morado },
+      className: "text-xs underline mt-1.5"
+    },
+    "\xBFC\xF3mo funciona?"
   )), /* @__PURE__ */ React.createElement(
     "button",
     {
@@ -905,7 +929,74 @@ function Cabecera({ sedeId, setSedeId, sedes, avisos, onGestion }) {
       /* @__PURE__ */ React.createElement(MapPin, { size: 12 }),
       s.nombre
     );
-  }))));
+  }))), mostrarComoFunciona && /* @__PURE__ */ React.createElement(ModalComoFunciona, { onCerrar: () => setMostrarComoFunciona(false) }));
+}
+function ModalComoFunciona({ onCerrar }) {
+  const pasos = [
+    {
+      titulo: "Prop\xF3n o s\xFAmate",
+      texto: "Elige un hueco libre y prop\xF3n la actividad que te apetece, o s\xFAmate a una propuesta que ya exista."
+    },
+    {
+      titulo: "Comparte y espera",
+      texto: "Cu\xE9ntaselo a amigos, o espera a que se vayan apuntando m\xE1s personas al mismo hueco."
+    },
+    {
+      titulo: "\xA1Al llegar a 8, arranca!",
+      texto: "Cuando llegu\xE9is a 8 personas apuntadas, la clase se confirma y os avisamos con la fecha de la clase de prueba."
+    },
+    {
+      titulo: "Confirma tu asistencia",
+      texto: "Nos dices que puedes ir ese d\xEDa, \xA1y nos vemos en Baildanzas!"
+    }
+  ];
+  return /* @__PURE__ */ React.createElement(
+    "div",
+    {
+      onClick: onCerrar,
+      style: { background: "rgba(36,30,49,0.55)", height: "100dvh" },
+      className: "fixed inset-0 z-[60] flex items-end sm:items-center justify-center p-0 sm:p-4 overflow-y-auto"
+    },
+    /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        onClick: (e) => e.stopPropagation(),
+        style: { background: PAL.papel, border: `1px solid ${PAL.linea}`, maxHeight: "85dvh" },
+        className: "w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl p-6 relative overflow-y-auto my-auto sm:my-0"
+      },
+      /* @__PURE__ */ React.createElement(
+        "button",
+        {
+          onClick: onCerrar,
+          style: { background: PAL.blanco, color: PAL.tinta, border: `1px solid ${PAL.linea}` },
+          className: "absolute top-4 right-4 w-9 h-9 rounded-full flex items-center justify-center shadow-sm z-10"
+        },
+        /* @__PURE__ */ React.createElement(X, { size: 18 })
+      ),
+      /* @__PURE__ */ React.createElement("h2", { style: { fontFamily: FONT.display, color: PAL.tinta }, className: "text-xl font-medium mb-1 pr-8" }, "\xBFC\xF3mo funciona?"),
+      /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.6 }, className: "text-sm mb-5" }, "Las clases no arrancan solas \u2014 sois vosotros quienes las hac\xE9is realidad."),
+      /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 16 } }, pasos.map((paso, i) => /* @__PURE__ */ React.createElement("div", { key: i, style: { display: "flex", flexDirection: "row", gap: 12, alignItems: "flex-start" } }, /* @__PURE__ */ React.createElement(
+        "div",
+        {
+          style: {
+            background: PAL.petroleo,
+            color: PAL.blanco,
+            fontFamily: FONT.mono,
+            width: 28,
+            height: 28,
+            minWidth: 28,
+            borderRadius: "9999px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center"
+          },
+          className: "text-xs font-medium"
+        },
+        i + 1
+      ), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, fontFamily: FONT.body }, className: "text-sm font-medium" }, paso.titulo), /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.7 }, className: "text-sm leading-relaxed" }, paso.texto))))),
+      /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.45 }, className: "text-[11px] text-center mt-6" }, '\xBFYa hay una clase "en marcha"? Puedes apuntarte directamente, sin esperar a nadie.')
+    )
+  );
 }
 function SelectorDia({ dia, diaIdx, setDiaIdx, dias }) {
   return /* @__PURE__ */ React.createElement("div", { className: "max-w-2xl mx-auto px-4 mt-5 flex items-center gap-3" }, /* @__PURE__ */ React.createElement(
@@ -1059,6 +1150,7 @@ function DotsProgreso({ n }) {
   }), /* @__PURE__ */ React.createElement("span", { style: { fontFamily: FONT.mono, color: colorActual, fontWeight: 700 }, className: "text-sm ml-1" }, n, "/", UMBRAL_PROPUESTA));
 }
 function ModalHueco({ info, estado, catalogo, onCerrar, onUnirseActiva, onUnirsePropuesta, onEnviarHueco }) {
+  const [mostrarPrivacidad, setMostrarPrivacidad] = useState(false);
   const [nombre, setNombre] = useState("");
   const [telefono, setTelefono] = useState("");
   const [seleccion, setSeleccion] = useState("");
@@ -1300,7 +1392,45 @@ function ModalHueco({ info, estado, catalogo, onCerrar, onUnirseActiva, onUnirse
           etiqueta
         );
       })(),
-      /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.4 }, className: "text-[11px] text-center mt-3" }, "Solo usaremos tu tel\xE9fono para avisarte de esta clase.")
+      /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.4 }, className: "text-[11px] text-center mt-3" }, "Solo usaremos tu tel\xE9fono para avisarte de esta clase.", " ", /* @__PURE__ */ React.createElement(
+        "button",
+        {
+          onClick: () => setMostrarPrivacidad(true),
+          style: { color: PAL.tinta, opacity: 0.7 },
+          className: "underline"
+        },
+        "Ver pol\xEDtica de privacidad"
+      ))
+    ),
+    mostrarPrivacidad && /* @__PURE__ */ React.createElement(ModalPrivacidad, { onCerrar: () => setMostrarPrivacidad(false) })
+  );
+}
+function ModalPrivacidad({ onCerrar }) {
+  return /* @__PURE__ */ React.createElement(
+    "div",
+    {
+      onClick: onCerrar,
+      style: { background: "rgba(36,30,49,0.55)", height: "100dvh" },
+      className: "fixed inset-0 z-[60] flex items-end sm:items-center justify-center p-0 sm:p-4 overflow-y-auto"
+    },
+    /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        onClick: (e) => e.stopPropagation(),
+        style: { background: PAL.papel, border: `1px solid ${PAL.linea}`, maxHeight: "85dvh" },
+        className: "w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl p-6 relative overflow-y-auto my-auto sm:my-0"
+      },
+      /* @__PURE__ */ React.createElement(
+        "button",
+        {
+          onClick: onCerrar,
+          style: { background: PAL.blanco, color: PAL.tinta, border: `1px solid ${PAL.linea}` },
+          className: "absolute top-4 right-4 w-9 h-9 rounded-full flex items-center justify-center shadow-sm z-10"
+        },
+        /* @__PURE__ */ React.createElement(X, { size: 18 })
+      ),
+      /* @__PURE__ */ React.createElement("h2", { style: { fontFamily: FONT.display, color: PAL.tinta }, className: "text-xl font-medium mb-4 pr-8" }, "Pol\xEDtica de privacidad"),
+      /* @__PURE__ */ React.createElement("div", { style: { color: PAL.tinta, opacity: 0.75 }, className: "text-sm space-y-3 leading-relaxed" }, /* @__PURE__ */ React.createElement("p", null, /* @__PURE__ */ React.createElement("strong", null, "Responsable:"), " Baildanzas (escuela de danza y arte), sedes en Madrid."), /* @__PURE__ */ React.createElement("p", null, /* @__PURE__ */ React.createElement("strong", null, "\xBFQu\xE9 datos pedimos?"), " Solo tu nombre de pila y tu n\xFAmero de tel\xE9fono, y los de las personas que apuntes contigo (amigos o hijos)."), /* @__PURE__ */ React.createElement("p", null, /* @__PURE__ */ React.createElement("strong", null, "\xBFPara qu\xE9 los usamos?"), " \xDAnicamente para gestionar tu propuesta o inscripci\xF3n a una clase: contarte cu\xE1ntos sois, avisarte cuando la clase arranca, y confirmar tu plaza o tu puesto en lista de espera."), /* @__PURE__ */ React.createElement("p", null, /* @__PURE__ */ React.createElement("strong", null, "\xBFCon qui\xE9n los compartimos?"), " Con nadie. No cedemos ni vendemos tus datos a terceros, ni se usan con fines publicitarios."), /* @__PURE__ */ React.createElement("p", null, /* @__PURE__ */ React.createElement("strong", null, "\xBFCu\xE1nto tiempo los guardamos?"), " Mientras seas alumno/a activo/a o tengas una propuesta en marcha. Puedes pedirnos que te demos de baja en cualquier momento."), /* @__PURE__ */ React.createElement("p", null, /* @__PURE__ */ React.createElement("strong", null, "Tus derechos:"), " Puedes pedirnos acceder a tus datos, corregirlos o eliminarlos por completo cuando quieras, escribiendo a Baildanzas directamente."), /* @__PURE__ */ React.createElement("p", null, /* @__PURE__ */ React.createElement("strong", null, "Contacto:"), " baildanzas@gmail.com"))
     )
   );
 }
@@ -2035,6 +2165,18 @@ function Toast({ mensaje }) {
       className: "fixed bottom-6 left-1/2 -translate-x-1/2 px-5 py-3 rounded-full text-sm shadow-xl z-50 max-w-[90vw] text-center"
     },
     mensaje
+  );
+}
+function BannerError({ mensaje, onRecargar, onCerrar }) {
+  return /* @__PURE__ */ React.createElement(
+    "div",
+    {
+      style: { background: PAL.carmin, color: "white", fontFamily: FONT.body },
+      className: "fixed top-0 left-0 right-0 z-[70] px-4 py-2.5 text-xs sm:text-sm flex items-center justify-center gap-3 flex-wrap text-center"
+    },
+    /* @__PURE__ */ React.createElement("span", null, "\u26A0\uFE0F ", mensaje),
+    /* @__PURE__ */ React.createElement("button", { onClick: onRecargar, className: "underline font-medium shrink-0" }, "Recargar"),
+    /* @__PURE__ */ React.createElement("button", { onClick: onCerrar, className: "opacity-80 hover:opacity-100 shrink-0" }, /* @__PURE__ */ React.createElement(X, { size: 14 }))
   );
 }
 function CandadoPIN({ onCerrar, onDesbloquear }) {
