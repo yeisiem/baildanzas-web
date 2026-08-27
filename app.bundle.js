@@ -385,14 +385,19 @@ function Baildanzas() {
       mostrarToast(
         confirmadas.length > 1 ? `\xA1Genial! Apuntadas ${confirmadas.length} personas. Os avisaremos para confirmar plaza.` : `\xA1Genial, ${confirmadas[0].nombre}! Te avisaremos en cuanto confirmemos plaza.`
       );
-    } else if (confirmadas.length === 0) {
-      mostrarToast(
-        enEspera.length > 1 ? `Aforo completo: ${enEspera.length} personas apuntadas en lista de espera.` : `Aforo completo. Apuntado en lista de espera, os avisaremos si se libera un hueco.`
-      );
     } else {
-      mostrarToast(
-        `\xA1Apuntados ${confirmadas.length}! Los ${enEspera.length} restantes quedan en lista de espera por aforo completo.`
-      );
+      const posicionFinal = nuevo.listaEspera[info.activityId].length;
+      const posicionInicial = posicionFinal - enEspera.length + 1;
+      const rango = enEspera.length > 1 ? `${posicionInicial} a ${posicionFinal}` : `${posicionFinal}`;
+      if (confirmadas.length === 0) {
+        mostrarToast(
+          enEspera.length > 1 ? `Clase completa. Est\xE1is en la lista de espera, en las posiciones ${rango}. Os avisaremos si se libera un hueco.` : `Clase completa. Est\xE1s en la lista de espera, en la posici\xF3n ${rango}. Te avisaremos si se libera un hueco.`
+        );
+      } else {
+        mostrarToast(
+          `\xA1Apuntados ${confirmadas.length}! Los ${enEspera.length} restantes quedan en la lista de espera, en las posiciones ${rango}.`
+        );
+      }
     }
     setModal(null);
   };
@@ -1087,17 +1092,7 @@ function FilaHora({ hora, dia, activas, propuestas, estado, onAbrirModal }) {
         style: { background: PAL.blanco, border: `1px solid ${PAL.linea}` },
         className: "w-full text-left px-4 py-3.5 rounded-2xl flex items-center justify-between gap-2 hover:shadow-sm transition-shadow"
       },
-      /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { fontFamily: FONT.display }, className: "font-medium text-lg leading-tight" }, act.nombre, act.nivel && /* @__PURE__ */ React.createElement("span", { style: { color: PAL.morado, opacity: 0.9 }, className: "text-sm ml-1.5" }, act.nivel)), /* @__PURE__ */ React.createElement("div", { style: { color: lleno ? PAL.carmin : PAL.petroleo }, className: "text-sm mt-1 font-medium" }, lleno ? `Aforo completo${enEspera > 0 ? ` \xB7 ${enEspera} en lista de espera` : ""}` : act.cupo != null ? `Clase en marcha \xB7 ${n}/${act.cupo} plazas` : "Clase en marcha")),
-      n > 0 && /* @__PURE__ */ React.createElement(
-        "div",
-        {
-          style: { fontFamily: FONT.mono, color: PAL.petroleo },
-          className: "text-sm flex items-center gap-1 shrink-0"
-        },
-        /* @__PURE__ */ React.createElement(Users, { size: 14 }),
-        " +",
-        n
-      )
+      /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { fontFamily: FONT.display }, className: "font-medium text-lg leading-tight" }, act.nombre, act.nivel && /* @__PURE__ */ React.createElement("span", { style: { color: PAL.morado, opacity: 0.9 }, className: "text-sm ml-1.5" }, act.nivel)), /* @__PURE__ */ React.createElement("div", { style: { color: lleno ? PAL.carmin : PAL.petroleo }, className: "text-sm mt-1 font-medium" }, lleno ? enEspera > 0 ? `Lista de Espera \xB7 ${enEspera}` : "Completa" : "Funcionando"))
     );
   }), propuestas.map((prop) => {
     const n = contarInteresados(estado, prop.id);
@@ -1293,7 +1288,7 @@ function ModalHueco({ info, estado, catalogo, onCerrar, onUnirseActiva, onUnirse
       ),
       /* @__PURE__ */ React.createElement("div", { style: { fontFamily: FONT.mono, color: PAL.tinta, opacity: 0.5 }, className: "text-[11px] uppercase tracking-widest pr-10" }, info.dia, " \xB7 ", info.hora, info.sala ? ` \xB7 ${info.sala}` : ""),
       /* @__PURE__ */ React.createElement("h2", { style: { fontFamily: FONT.display, color: PAL.tinta }, className: "text-2xl font-medium mt-1 mb-4 pr-8" }, info.modo === "vacio" ? "Prop\xF3n una actividad" : info.nombreActividad),
-      info.modo === "activa" && /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.75 }, className: "text-sm mb-5 leading-relaxed" }, infoInscritosActiva.lleno ? `Esta clase tiene el aforo completo (${info.cupo} plazas). D\xE9janos tus datos y te apuntamos en la lista de espera \u2014 te avisaremos si se libera un hueco.` : "Esta clase ya est\xE1 funcionando. D\xE9janos tus datos y te avisaremos para confirmar tu plaza."),
+      info.modo === "activa" && /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.75 }, className: "text-sm mb-5 leading-relaxed" }, infoInscritosActiva.lleno ? `Esta clase est\xE1 completa (${info.cupo} plazas). D\xE9janos tus datos y te apuntamos en la lista de espera \u2014 te diremos tu posici\xF3n al momento, y te avisaremos si se libera un hueco.` : "Esta clase ya est\xE1 funcionando. D\xE9janos tus datos y te avisaremos para confirmar tu plaza."),
       info.modo === "propuesta" && /* @__PURE__ */ React.createElement("div", { className: "mb-5" }, /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.75 }, className: "text-sm mb-3 leading-relaxed" }, "A\xFAn no hay grupo suficiente. S\xFAmate y ayuda a que esta clase arranque."), /* @__PURE__ */ React.createElement(DotsProgreso, { n: contarInteresados(estado, info.activityId) })),
       info.modo === "vacio" && /* @__PURE__ */ React.createElement("div", { className: "mb-5" }, /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.75 }, className: "text-sm mb-3 leading-relaxed" }, "\xBFQu\xE9 actividad te gustar\xEDa hacer aqu\xED? Puedes a\xF1adir m\xE1s de una si te vale cualquiera de ellas."), listaActividades.length > 0 && /* @__PURE__ */ React.createElement("div", { className: "flex flex-wrap gap-1.5 mb-2" }, listaActividades.map((a) => /* @__PURE__ */ React.createElement(
         "span",
