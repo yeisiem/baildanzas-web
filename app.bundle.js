@@ -567,6 +567,10 @@ function Baildanzas() {
         resuelto: false
       });
     }
+    const nombreLimpio = s.nombre.trim();
+    if (!nuevo.catalogoActividades.includes(nombreLimpio)) {
+      nuevo.catalogoActividades = [...nuevo.catalogoActividades, nombreLimpio];
+    }
     persistir(nuevo);
   };
   const rechazarSugerencia = (sugerenciaId) => {
