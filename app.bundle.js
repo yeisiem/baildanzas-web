@@ -241,9 +241,9 @@ var DISPONIBILIDAD_SEDE2 = {
 };
 var estadoInicial = () => ({
   sedes: {
-    1: { nombre: "Baildanzas I", activas: semillaHorario(), propuestas: {}, disponibilidad: DISPONIBILIDAD_SEDE1 },
+    1: { nombre: "Baildanzas Calle de los Narcisos, 14", activas: semillaHorario(), propuestas: {}, disponibilidad: DISPONIBILIDAD_SEDE1 },
     2: {
-      nombre: "Baildanzas II",
+      nombre: "Calle de Víctor de la Serna, 37",
       activas: {},
       propuestas: {},
       salas: ["Sala 1", "Sala 2"],
@@ -561,11 +561,35 @@ function Baildanzas() {
     nuevo.sedes[sedeId].disponibilidad[dia2][claveSala] = ventanas;
     persistir(nuevo);
   };
+  const renombrarSede = (nuevoNombre) => {
+    if (!nuevoNombre.trim()) return;
+    const nuevo = structuredClone(estado);
+    nuevo.sedes[sedeId].nombre = nuevoNombre.trim();
+    persistir(nuevo);
+  };
   const borrarActividadBase = (dia2, hora, activityId) => {
     const nuevo = structuredClone(estado);
     nuevo.sedes[sedeId].activas[dia2][hora] = nuevo.sedes[sedeId].activas[dia2][hora].filter(
       (a) => a.id !== activityId
     );
+    persistir(nuevo);
+  };
+  const editarClaseFija = (diaViejo, horaVieja, activityId, cambios) => {
+    const nuevo = structuredClone(estado);
+    const listaVieja = nuevo.sedes[sedeId].activas[diaViejo]?.[horaVieja] || [];
+    const idx = listaVieja.findIndex((a) => a.id === activityId);
+    if (idx === -1) return;
+    const act = listaVieja[idx];
+    const actualizada = {
+      ...act,
+      nombre: cambios.nombre.trim(),
+      nivel: cambios.nivel.trim(),
+      sala: cambios.sala || void 0
+    };
+    listaVieja.splice(idx, 1);
+    if (!nuevo.sedes[sedeId].activas[cambios.dia]) nuevo.sedes[sedeId].activas[cambios.dia] = {};
+    if (!nuevo.sedes[sedeId].activas[cambios.dia][cambios.hora]) nuevo.sedes[sedeId].activas[cambios.dia][cambios.hora] = [];
+    nuevo.sedes[sedeId].activas[cambios.dia][cambios.hora].push(actualizada);
     persistir(nuevo);
   };
   const aprobarSugerencia = (sugerenciaId) => {
@@ -849,6 +873,8 @@ function Baildanzas() {
       onEditarCupo: editarCupoActividad,
       onAlternarForzarCompleto: alternarForzarCompleto,
       onEditarDisponibilidad: editarDisponibilidad,
+      onEditarClaseFija: editarClaseFija,
+      onRenombrarSede: renombrarSede,
       onBorrar: borrarActividadBase,
       onAprobarSugerencia: aprobarSugerencia,
       onRechazarSugerencia: rechazarSugerencia,
@@ -1603,6 +1629,8 @@ function PanelGestion({
   onEditarCupo,
   onAlternarForzarCompleto,
   onEditarDisponibilidad,
+  onEditarClaseFija,
+  onRenombrarSede,
   onBorrar,
   onAprobarSugerencia,
   onRechazarSugerencia,
@@ -1635,8 +1663,33 @@ function PanelGestion({
   const [confirmandoConversion, setConfirmandoConversion] = useState(null);
   const [fechaPrueba, setFechaPrueba] = useState("");
   const [expandidaActiva, setExpandidaActiva] = useState(null);
+  const [editandoClaseId, setEditandoClaseId] = useState(null);
+  const [ecNombre, setEcNombre] = useState("");
+  const [ecNivel, setEcNivel] = useState("");
+  const [ecDia, setEcDia] = useState("");
+  const [ecHora, setEcHora] = useState("");
+  const [ecSala, setEcSala] = useState("");
   const [nuevoAlumnoNombre, setNuevoAlumnoNombre] = useState("");
   const [nuevoAlumnoTelefono, setNuevoAlumnoTelefono] = useState("");
+  const empezarEdicionClase = (d, h, act) => {
+    setEditandoClaseId(act.id);
+    setEcNombre(act.nombre);
+    setEcNivel(act.nivel || "");
+    setEcDia(d);
+    setEcHora(h);
+    setEcSala(act.sala || "");
+  };
+  const guardarEdicionClase = (diaViejo, horaVieja) => {
+    if (ecNombre.trim().length < 2 || !ecDia || !ecHora) return;
+    onEditarClaseFija(diaViejo, horaVieja, editandoClaseId, {
+      nombre: ecNombre,
+      nivel: ecNivel,
+      dia: ecDia,
+      hora: ecHora,
+      sala: ecSala
+    });
+    setEditandoClaseId(null);
+  };
   const pendientes = avisos.filter((a) => !a.resuelto);
   const resueltos = avisos.filter((a) => a.resuelto);
   const sugerenciasPendientes = sugerencias.filter((s) => s.estado === "pendiente");
@@ -1980,7 +2033,78 @@ function PanelGestion({
               alumnos.length,
               act.cupo ? `/${act.cupo}` : ""
             )
-          ), desplegada && /* @__PURE__ */ React.createElement("div", { style: { background: PAL.papel, border: `1px solid ${PAL.linea}` }, className: "rounded-xl p-3 mt-2" }, /* @__PURE__ */ React.createElement("div", { className: "flex items-center gap-1.5 mb-2 flex-wrap" }, /* @__PURE__ */ React.createElement(
+          ), desplegada && /* @__PURE__ */ React.createElement("div", { style: { background: PAL.papel, border: `1px solid ${PAL.linea}` }, className: "rounded-xl p-3 mt-2" }, editandoClaseId === act.id ? /* @__PURE__ */ React.createElement("div", { className: "space-y-2 mb-3" }, /* @__PURE__ */ React.createElement(
+            "input",
+            {
+              value: ecNombre,
+              onChange: (e) => setEcNombre(e.target.value),
+              placeholder: "Nombre de la actividad",
+              className: "w-full px-2.5 py-1.5 rounded-lg border text-sm",
+              style: { borderColor: PAL.linea }
+            }
+          ), /* @__PURE__ */ React.createElement(
+            "input",
+            {
+              value: ecNivel,
+              onChange: (e) => setEcNivel(e.target.value),
+              placeholder: "Nivel o edad (opcional)",
+              className: "w-full px-2.5 py-1.5 rounded-lg border text-sm",
+              style: { borderColor: PAL.linea }
+            }
+          ), /* @__PURE__ */ React.createElement("div", { className: "flex gap-1.5" }, /* @__PURE__ */ React.createElement(
+            "select",
+            {
+              value: ecDia,
+              onChange: (e) => setEcDia(e.target.value),
+              className: "flex-1 px-2 py-1.5 rounded-lg border text-sm",
+              style: { borderColor: PAL.linea }
+            },
+            DIAS.map((dd) => /* @__PURE__ */ React.createElement("option", { key: dd }, dd))
+          ), /* @__PURE__ */ React.createElement(
+            "input",
+            {
+              type: "time",
+              value: ecHora,
+              onChange: (e) => setEcHora(e.target.value),
+              className: "px-2 py-1.5 rounded-lg border text-sm",
+              style: { borderColor: PAL.linea }
+            }
+          )), sede.salas && /* @__PURE__ */ React.createElement(
+            "select",
+            {
+              value: ecSala,
+              onChange: (e) => setEcSala(e.target.value),
+              className: "w-full px-2 py-1.5 rounded-lg border text-sm",
+              style: { borderColor: PAL.linea }
+            },
+            sede.salas.map((s) => /* @__PURE__ */ React.createElement("option", { key: s }, s))
+          ), /* @__PURE__ */ React.createElement("div", { className: "flex gap-2" }, /* @__PURE__ */ React.createElement(
+            "button",
+            {
+              onClick: () => guardarEdicionClase(d, h),
+              style: { background: PAL.petroleo },
+              className: "flex-1 py-1.5 rounded-lg text-white text-xs font-medium flex items-center justify-center gap-1"
+            },
+            /* @__PURE__ */ React.createElement(Check, { size: 13 }),
+            " Guardar cambios"
+          ), /* @__PURE__ */ React.createElement(
+            "button",
+            {
+              onClick: () => setEditandoClaseId(null),
+              style: { borderColor: PAL.linea, color: PAL.tinta },
+              className: "flex-1 py-1.5 rounded-lg border text-xs font-medium"
+            },
+            "Cancelar"
+          )), /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.55 }, className: "text-[11px]" }, "El alumnado y las plazas ya apuntadas se mantienen aunque cambies el día o la hora.")) : /* @__PURE__ */ React.createElement(
+            "button",
+            {
+              onClick: () => empezarEdicionClase(d, h, act),
+              style: { borderColor: PAL.linea, color: PAL.tinta },
+              className: "w-full flex items-center justify-center gap-1.5 py-1.5 rounded-lg border text-xs font-medium mb-2"
+            },
+            /* @__PURE__ */ React.createElement(Pencil, { size: 12 }),
+            " Editar nombre, nivel, día u hora"
+          ), /* @__PURE__ */ React.createElement("div", { className: "flex items-center gap-1.5 mb-2 flex-wrap" }, /* @__PURE__ */ React.createElement(
             "input",
             {
               defaultValue: act.cupo || "",
@@ -2069,7 +2193,16 @@ function PanelGestion({
         })
       ));
     }))),
-    tab === "disponibilidad" && /* @__PURE__ */ React.createElement(EditorDisponibilidad, { sede, onEditarDisponibilidad }),
+    tab === "disponibilidad" && /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { border: `1px solid ${PAL.linea}` }, className: "rounded-xl p-3 mb-4" }, /* @__PURE__ */ React.createElement("label", { style: { color: PAL.tinta, opacity: 0.7 }, className: "text-xs block mb-1.5" }, "Nombre de esta sede (se ve en el selector y en todo el calendario público)"), /* @__PURE__ */ React.createElement("div", { className: "flex gap-2" }, /* @__PURE__ */ React.createElement(
+      "input",
+      {
+        key: sede.nombre,
+        defaultValue: sede.nombre,
+        onBlur: (e) => onRenombrarSede(e.target.value),
+        className: "flex-1 px-2.5 py-1.5 rounded-lg border text-sm",
+        style: { borderColor: PAL.linea }
+      }
+    ))), /* @__PURE__ */ React.createElement(EditorDisponibilidad, { sede, onEditarDisponibilidad })),
     tab === "propuestas" && /* @__PURE__ */ React.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.7 }, className: "text-xs mb-1" }, "Todas las propuestas abiertas del catálogo, con quién se ha apuntado a cada una."), listaPropuestas.length === 0 && /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.7 }, className: "text-sm" }, "No hay ninguna propuesta abierta ahora mismo."), listaPropuestas.slice().sort((a, b) => b.ultimoTs - a.ultimoTs).map((p) => {
       const duplicados = grupoDuplicado(p).filter((d) => d.id !== p.id);
       return /* @__PURE__ */ React.createElement("div", { key: p.id, style: { background: PAL.blanco, border: `1.5px dashed ${PAL.mostaza}` }, className: "p-4 rounded-2xl" }, /* @__PURE__ */ React.createElement("div", { className: "flex items-start justify-between gap-2 mb-2" }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { fontFamily: FONT.display }, className: "font-medium text-sm" }, p.nombre), /* @__PURE__ */ React.createElement("div", { style: { fontFamily: FONT.mono, opacity: 0.7 }, className: "text-[12px] mt-1" }, p.dia, " · ", p.hora, p.sala ? ` · ${p.sala}` : "")), /* @__PURE__ */ React.createElement(DotsProgreso, { n: p.personas.length })), duplicados.length > 0 && /* @__PURE__ */ React.createElement("div", { style: { background: PAL.papel, border: `1px solid ${PAL.carmin}` }, className: "rounded-xl p-2.5 mb-3" }, /* @__PURE__ */ React.createElement("p", { style: { color: PAL.carmin }, className: "text-[13px] mb-1.5" }, "Hay ", duplicados.length + 1, ' propuestas de "', p.nombre, '" en este mismo hueco — probablemente por error.'), /* @__PURE__ */ React.createElement(
