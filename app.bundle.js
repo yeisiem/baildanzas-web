@@ -206,6 +206,15 @@ var CATALOGO_INICIAL = [
   "Tai Chi",
   "Zumba"
 ];
+var DISPONIBILIDAD_SEDE1 = {
+  Lunes: { __unica__: [{ inicio: "09:30", fin: "22:30" }] },
+  Martes: { __unica__: [{ inicio: "09:30", fin: "22:30" }] },
+  Miércoles: { __unica__: [{ inicio: "09:30", fin: "22:30" }] },
+  Jueves: { __unica__: [{ inicio: "09:30", fin: "22:30" }] },
+  Viernes: { __unica__: [{ inicio: "09:30", fin: "22:30" }] },
+  Sábado: { __unica__: [] },
+  Domingo: { __unica__: [] }
+};
 var DISPONIBILIDAD_SEDE2 = {
   Lunes: {
     "Sala 1": [{ inicio: "09:00", fin: "14:00" }, { inicio: "17:00", fin: "18:30" }],
@@ -232,7 +241,7 @@ var DISPONIBILIDAD_SEDE2 = {
 };
 var estadoInicial = () => ({
   sedes: {
-    1: { nombre: "Baildanzas I", activas: semillaHorario(), propuestas: {} },
+    1: { nombre: "Baildanzas I", activas: semillaHorario(), propuestas: {}, disponibilidad: DISPONIBILIDAD_SEDE1 },
     2: {
       nombre: "Baildanzas II",
       activas: {},
@@ -317,6 +326,9 @@ function Baildanzas() {
         base.sedes[2].salas = ["Sala 1", "Sala 2"];
         base.sedes[2].disponibilidad = DISPONIBILIDAD_SEDE2;
       }
+      if (base.sedes[1] && !base.sedes[1].disponibilidad) {
+        base.sedes[1].disponibilidad = DISPONIBILIDAD_SEDE1;
+      }
       setEstado(base);
       setCargando(false);
       if (resultado.error) setErrorCarga(true);
@@ -337,7 +349,7 @@ function Baildanzas() {
   if (cargando || !estado) {
     return /* @__PURE__ */ React.createElement("div", { style: { background: PAL.papel }, className: "min-h-screen flex items-center justify-center" }, /* @__PURE__ */ React.createElement("div", { style: { fontFamily: FONT.display, color: PAL.tinta }, className: "text-2xl italic animate-pulse" }, "Preparando el compás…"), /* @__PURE__ */ React.createElement(FontImport, null));
   }
-  const diasVisibles = sedeId === 1 ? DIAS.slice(0, 5) : DIAS;
+  const diasVisibles = DIAS;
   const dia = diasVisibles[diaIdx % diasVisibles.length];
   const sede = estado.sedes[sedeId];
   const unirseAActiva = (personas) => {
@@ -345,12 +357,16 @@ function Baildanzas() {
     const info = modal;
     const loc = localizarObjetoActivo(nuevo, info.activityId);
     const cupo = loc?.act?.cupo;
+    const forzado = loc?.act?.forzarCompleto;
     if (!nuevo.interesados[info.activityId]) nuevo.interesados[info.activityId] = [];
     if (!nuevo.listaEspera[info.activityId]) nuevo.listaEspera[info.activityId] = [];
     const yaInscritos = nuevo.interesados[info.activityId].length;
     let confirmadas = personas;
     let enEspera = [];
-    if (cupo != null) {
+    if (forzado) {
+      confirmadas = [];
+      enEspera = personas;
+    } else if (cupo != null) {
       const huecosLibres = Math.max(cupo - yaInscritos, 0);
       confirmadas = personas.slice(0, huecosLibres);
       enEspera = personas.slice(huecosLibres);
@@ -529,6 +545,20 @@ function Baildanzas() {
     const lista = nuevo.sedes[sedeId].activas[dia2]?.[hora] || [];
     const act = lista.find((a) => a.id === activityId);
     if (act) act.cupo = nuevoCupo || void 0;
+    persistir(nuevo);
+  };
+  const alternarForzarCompleto = (dia2, hora, activityId) => {
+    const nuevo = structuredClone(estado);
+    const lista = nuevo.sedes[sedeId].activas[dia2]?.[hora] || [];
+    const act = lista.find((a) => a.id === activityId);
+    if (act) act.forzarCompleto = !act.forzarCompleto;
+    persistir(nuevo);
+  };
+  const editarDisponibilidad = (dia2, claveSala, ventanas) => {
+    const nuevo = structuredClone(estado);
+    if (!nuevo.sedes[sedeId].disponibilidad) nuevo.sedes[sedeId].disponibilidad = {};
+    if (!nuevo.sedes[sedeId].disponibilidad[dia2]) nuevo.sedes[sedeId].disponibilidad[dia2] = {};
+    nuevo.sedes[sedeId].disponibilidad[dia2][claveSala] = ventanas;
     persistir(nuevo);
   };
   const borrarActividadBase = (dia2, hora, activityId) => {
@@ -760,7 +790,8 @@ function Baildanzas() {
     const sala = sede.salas ? salaSeleccionada : null;
     const activasDia = sala ? filtrarPorSala(sede.activas[dia], sala) : sede.activas[dia] || {};
     const propuestasDia = sala ? filtrarPorSala(sede.propuestas[dia], sala) : sede.propuestas[dia] || {};
-    const horasBase = sala ? horasDisponiblesDeSala(sede.disponibilidad?.[dia]?.[sala]) : new Set(HORAS);
+    const claveSala = sala || "__unica__";
+    const horasBase = horasDisponiblesDeSala(sede.disponibilidad?.[dia]?.[claveSala]);
     const horas = Array.from(/* @__PURE__ */ new Set([...horasBase, ...Object.keys(activasDia), ...Object.keys(propuestasDia)])).filter((hora) => {
       const tieneActivas = (activasDia[hora] || []).length > 0;
       const tienePropuestas = (propuestasDia[hora] || []).length > 0;
@@ -816,6 +847,8 @@ function Baildanzas() {
       onResolver: resolverAviso,
       onAnadir: anadirActividadBase,
       onEditarCupo: editarCupoActividad,
+      onAlternarForzarCompleto: alternarForzarCompleto,
+      onEditarDisponibilidad: editarDisponibilidad,
       onBorrar: borrarActividadBase,
       onAprobarSugerencia: aprobarSugerencia,
       onRechazarSugerencia: rechazarSugerencia,
@@ -1079,7 +1112,7 @@ function FilaHora({ hora, dia, activas, propuestas, estado, onAbrirModal }) {
   ), /* @__PURE__ */ React.createElement("div", { className: "flex-1 min-w-0 space-y-2" }, activas.map((act) => {
     const n = contarInteresados(estado, act.id);
     const enEspera = (estado.listaEspera[act.id] || []).length;
-    const lleno = act.cupo != null && n >= act.cupo;
+    const lleno = act.cupo != null && n >= act.cupo || !!act.forzarCompleto;
     return /* @__PURE__ */ React.createElement(
       "button",
       {
@@ -1090,6 +1123,7 @@ function FilaHora({ hora, dia, activas, propuestas, estado, onAbrirModal }) {
           modo: "activa",
           activityId: act.id,
           cupo: act.cupo,
+          forzarCompleto: act.forzarCompleto,
           nombreActividad: act.nivel ? `${act.nombre} · ${act.nivel}` : act.nombre
         }),
         style: { background: PAL.blanco, border: `1px solid ${PAL.linea}` },
@@ -1165,7 +1199,7 @@ function ModalHueco({ info, estado, catalogo, onCerrar, onUnirseActiva, onUnirse
   const inscritosActuales = info.modo === "activa" ? contarInteresados(estado, info.activityId) : 0;
   const infoInscritosActiva = {
     inscritos: inscritosActuales,
-    lleno: info.modo === "activa" && info.cupo != null && inscritosActuales >= info.cupo
+    lleno: info.modo === "activa" && (info.cupo != null && inscritosActuales >= info.cupo || !!info.forzarCompleto)
   };
   const anadirALaLista = () => {
     if (esOtro) {
@@ -1567,6 +1601,8 @@ function PanelGestion({
   onResolver,
   onAnadir,
   onEditarCupo,
+  onAlternarForzarCompleto,
+  onEditarDisponibilidad,
   onBorrar,
   onAprobarSugerencia,
   onRechazarSugerencia,
@@ -1604,7 +1640,7 @@ function PanelGestion({
   const pendientes = avisos.filter((a) => !a.resuelto);
   const resueltos = avisos.filter((a) => a.resuelto);
   const sugerenciasPendientes = sugerencias.filter((s) => s.estado === "pendiente");
-  const diasSede = sedeId === 1 ? DIAS.slice(0, 5) : DIAS;
+  const diasSede = DIAS;
   const listaPropuestas = [];
   diasSede.forEach((d) => {
     const porHora = sede.propuestas[d] || {};
@@ -1673,6 +1709,7 @@ function PanelGestion({
       ["sugerencias", "Sugerencias", sugerenciasPendientes.length, PAL.carmin, 0],
       ["buscar", "Buscar", null, PAL.carmin, 0],
       ["horario", "Horario base", null, PAL.carmin, 0],
+      ["disponibilidad", "Disponibilidad", null, PAL.carmin, 0],
       ["catalogo", "Catálogo", null, PAL.carmin, 0]
     ].map(([id, label, badge, colorBadge, badgeExtra]) => /* @__PURE__ */ React.createElement(
       "button",
@@ -1943,7 +1980,7 @@ function PanelGestion({
               alumnos.length,
               act.cupo ? `/${act.cupo}` : ""
             )
-          ), desplegada && /* @__PURE__ */ React.createElement("div", { style: { background: PAL.papel, border: `1px solid ${PAL.linea}` }, className: "rounded-xl p-3 mt-2" }, /* @__PURE__ */ React.createElement("div", { className: "flex items-center gap-1.5 mb-2" }, /* @__PURE__ */ React.createElement(
+          ), desplegada && /* @__PURE__ */ React.createElement("div", { style: { background: PAL.papel, border: `1px solid ${PAL.linea}` }, className: "rounded-xl p-3 mt-2" }, /* @__PURE__ */ React.createElement("div", { className: "flex items-center gap-1.5 mb-2 flex-wrap" }, /* @__PURE__ */ React.createElement(
             "input",
             {
               defaultValue: act.cupo || "",
@@ -1966,7 +2003,20 @@ function PanelGestion({
               title: "Eliminar esta clase del horario"
             },
             /* @__PURE__ */ React.createElement(Trash2, { size: 13 })
-          )), alumnos.length > 0 ? /* @__PURE__ */ React.createElement("div", { style: { background: PAL.blanco, border: `1px solid ${PAL.linea}` }, className: "rounded-lg px-2 mb-2" }, alumnos.map((al, idx) => /* @__PURE__ */ React.createElement(
+          )), /* @__PURE__ */ React.createElement(
+            "button",
+            {
+              onClick: () => onAlternarForzarCompleto(d, h, act.id),
+              style: {
+                background: act.forzarCompleto ? PAL.carmin : PAL.blanco,
+                color: act.forzarCompleto ? PAL.blanco : PAL.tinta,
+                border: `1px solid ${act.forzarCompleto ? PAL.carmin : PAL.linea}`
+              },
+              className: "w-full flex items-center justify-center gap-2 py-1.5 rounded-lg text-xs font-medium mb-2",
+              title: "Marca esta clase como completa a mano, sin importar cuántas plazas queden libres de verdad"
+            },
+            act.forzarCompleto ? /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement(Check, { size: 13 }), " Marcada como completa a mano — pulsa para reactivarla") : "Marcar como completa a mano"
+          ), alumnos.length > 0 ? /* @__PURE__ */ React.createElement("div", { style: { background: PAL.blanco, border: `1px solid ${PAL.linea}` }, className: "rounded-lg px-2 mb-2" }, alumnos.map((al, idx) => /* @__PURE__ */ React.createElement(
             FilaPersona,
             {
               key: idx,
@@ -2019,6 +2069,7 @@ function PanelGestion({
         })
       ));
     }))),
+    tab === "disponibilidad" && /* @__PURE__ */ React.createElement(EditorDisponibilidad, { sede, onEditarDisponibilidad }),
     tab === "propuestas" && /* @__PURE__ */ React.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.7 }, className: "text-xs mb-1" }, "Todas las propuestas abiertas del catálogo, con quién se ha apuntado a cada una."), listaPropuestas.length === 0 && /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.7 }, className: "text-sm" }, "No hay ninguna propuesta abierta ahora mismo."), listaPropuestas.slice().sort((a, b) => b.ultimoTs - a.ultimoTs).map((p) => {
       const duplicados = grupoDuplicado(p).filter((d) => d.id !== p.id);
       return /* @__PURE__ */ React.createElement("div", { key: p.id, style: { background: PAL.blanco, border: `1.5px dashed ${PAL.mostaza}` }, className: "p-4 rounded-2xl" }, /* @__PURE__ */ React.createElement("div", { className: "flex items-start justify-between gap-2 mb-2" }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { fontFamily: FONT.display }, className: "font-medium text-sm" }, p.nombre), /* @__PURE__ */ React.createElement("div", { style: { fontFamily: FONT.mono, opacity: 0.7 }, className: "text-[12px] mt-1" }, p.dia, " · ", p.hora, p.sala ? ` · ${p.sala}` : "")), /* @__PURE__ */ React.createElement(DotsProgreso, { n: p.personas.length })), duplicados.length > 0 && /* @__PURE__ */ React.createElement("div", { style: { background: PAL.papel, border: `1px solid ${PAL.carmin}` }, className: "rounded-xl p-2.5 mb-3" }, /* @__PURE__ */ React.createElement("p", { style: { color: PAL.carmin }, className: "text-[13px] mb-1.5" }, "Hay ", duplicados.length + 1, ' propuestas de "', p.nombre, '" en este mismo hueco — probablemente por error.'), /* @__PURE__ */ React.createElement(
@@ -2181,6 +2232,81 @@ Gracias a tu propuesta (y a las demás personas interesadas), ya somos suficient
       /* @__PURE__ */ React.createElement("button", { onClick: () => onBorrarCatalogo(a), style: { color: PAL.carmin, opacity: 0.76 } }, /* @__PURE__ */ React.createElement(X, { size: 12 }))
     ))))
   ));
+}
+function EditorDisponibilidad({ sede, onEditarDisponibilidad }) {
+  const salas = sede.salas || null;
+  const [salaActiva, setSalaActiva] = useState(salas ? salas[0] : "__unica__");
+  const [nuevoInicio, setNuevoInicio] = useState({});
+  const [nuevoFin, setNuevoFin] = useState({});
+  const ventanasDe = (dia) => sede.disponibilidad?.[dia]?.[salaActiva] || [];
+  const anadirVentana = (dia) => {
+    const inicio = nuevoInicio[dia];
+    const fin = nuevoFin[dia];
+    if (!inicio || !fin || inicio >= fin) return;
+    const actuales = ventanasDe(dia);
+    onEditarDisponibilidad(dia, salaActiva, [...actuales, { inicio, fin }].sort((a, b) => a.inicio.localeCompare(b.inicio)));
+    setNuevoInicio((s) => ({ ...s, [dia]: "" }));
+    setNuevoFin((s) => ({ ...s, [dia]: "" }));
+  };
+  const quitarVentana = (dia, idx) => {
+    const actuales = ventanasDe(dia);
+    onEditarDisponibilidad(dia, salaActiva, actuales.filter((_, i) => i !== idx));
+  };
+  return /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.7 }, className: "text-xs mb-4" }, "Marca aquí qué días y a qué horas está abierta ", salas ? "cada sala" : "esta sede", ". Fuera de estas franjas, el hueco no aparece en el calendario público — ni para propuestas ni para clases."), salas && /* @__PURE__ */ React.createElement("div", { className: "flex gap-2 mb-4" }, salas.map((s) => /* @__PURE__ */ React.createElement(
+    "button",
+    {
+      key: s,
+      onClick: () => setSalaActiva(s),
+      style: {
+        background: salaActiva === s ? PAL.morado : "transparent",
+        color: salaActiva === s ? PAL.blanco : PAL.tinta,
+        border: `1px solid ${PAL.morado}`
+      },
+      className: "px-3 py-1.5 rounded-full text-xs font-medium"
+    },
+    s
+  ))), /* @__PURE__ */ React.createElement("div", { className: "space-y-3" }, DIAS.map((dia) => {
+    const ventanas = ventanasDe(dia);
+    return /* @__PURE__ */ React.createElement("div", { key: dia, style: { border: `1px solid ${PAL.linea}` }, className: "rounded-xl p-3" }, /* @__PURE__ */ React.createElement("div", { style: { fontFamily: FONT.mono }, className: "text-[13px] uppercase tracking-wider mb-2" }, dia), ventanas.length === 0 ? /* @__PURE__ */ React.createElement("p", { style: { color: PAL.carmin, opacity: 0.85 }, className: "text-xs mb-2" }, "Cerrado — ningún hueco disponible este día") : /* @__PURE__ */ React.createElement("div", { className: "flex flex-wrap gap-1.5 mb-2" }, ventanas.map((v, i) => /* @__PURE__ */ React.createElement(
+      "span",
+      {
+        key: i,
+        style: { background: PAL.petroleo, color: PAL.papel, fontFamily: FONT.mono },
+        className: "text-[12px] px-2.5 py-1 rounded-full flex items-center gap-1.5"
+      },
+      v.inicio,
+      "–",
+      v.fin,
+      /* @__PURE__ */ React.createElement("button", { onClick: () => quitarVentana(dia, i), style: { opacity: 0.75 }, title: "Quitar esta franja" }, /* @__PURE__ */ React.createElement(X, { size: 11 }))
+    ))), /* @__PURE__ */ React.createElement("div", { className: "flex items-center gap-1.5 flex-wrap" }, /* @__PURE__ */ React.createElement(
+      "input",
+      {
+        type: "time",
+        value: nuevoInicio[dia] || "",
+        onChange: (e) => setNuevoInicio((s) => ({ ...s, [dia]: e.target.value })),
+        style: { borderColor: PAL.linea },
+        className: "px-2 py-1 rounded-md border text-xs"
+      }
+    ), /* @__PURE__ */ React.createElement("span", { style: { opacity: 0.6 }, className: "text-xs" }, "a"), /* @__PURE__ */ React.createElement(
+      "input",
+      {
+        type: "time",
+        value: nuevoFin[dia] || "",
+        onChange: (e) => setNuevoFin((s) => ({ ...s, [dia]: e.target.value })),
+        style: { borderColor: PAL.linea },
+        className: "px-2 py-1 rounded-md border text-xs"
+      }
+    ), /* @__PURE__ */ React.createElement(
+      "button",
+      {
+        onClick: () => anadirVentana(dia),
+        disabled: !nuevoInicio[dia] || !nuevoFin[dia],
+        style: { background: PAL.tinta, opacity: !nuevoInicio[dia] || !nuevoFin[dia] ? 0.4 : 1 },
+        className: "px-3 py-1 rounded-md text-white text-xs"
+      },
+      "Añadir franja"
+    )));
+  })));
 }
 function FilaPersona({ nombre, telefono, ts, onQuitar, tituloQuitar, onGuardarEdicion }) {
   const [editando, setEditando] = useState(false);
