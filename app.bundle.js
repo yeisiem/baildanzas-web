@@ -768,7 +768,7 @@ function Baildanzas() {
       return !estaCubiertaPorOtraClase(hora, activasDia);
     }).sort();
     if (sala && horas.length === 0) {
-      return /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.4 }, className: "text-sm text-center py-10" }, "Este día, ", sala.toLowerCase(), " está cerrada.");
+      return /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.62 }, className: "text-sm text-center py-10" }, "Este día, ", sala.toLowerCase(), " está cerrada.");
     }
     return horas.map((hora) => /* @__PURE__ */ React.createElement(
       FilaHora,
@@ -874,7 +874,7 @@ function FontImport() {
       }
       input::placeholder, textarea::placeholder {
         color: #241E31;
-        opacity: 0.35;
+        opacity: 0.6;
         -webkit-text-fill-color: #241E31;
       }
       @media (prefers-reduced-motion: reduce) {
@@ -894,8 +894,8 @@ function Cabecera({ sedeId, setSedeId, sedes, avisos, onGestion }) {
   ), /* @__PURE__ */ React.createElement(
     "p",
     {
-      style: { fontFamily: FONT.mono, color: PAL.tinta, opacity: 0.6 },
-      className: "text-[11px] uppercase tracking-[0.18em] mt-1.5"
+      style: { fontFamily: FONT.mono, color: PAL.tinta, opacity: 0.76 },
+      className: "text-[13px] uppercase tracking-[0.18em] mt-1.5"
     },
     "Elige tu ritmo · elige tu horario"
   ), /* @__PURE__ */ React.createElement(
@@ -911,7 +911,7 @@ function Cabecera({ sedeId, setSedeId, sedes, avisos, onGestion }) {
     {
       onClick: onGestion,
       title: "Panel de gestión",
-      style: { color: PAL.tinta, opacity: 0.45 },
+      style: { color: PAL.tinta, opacity: 0.65 },
       className: "p-2 hover:opacity-90 transition-opacity relative"
     },
     /* @__PURE__ */ React.createElement(Settings, { size: 18 }),
@@ -986,7 +986,7 @@ function ModalComoFunciona({ onCerrar }) {
         /* @__PURE__ */ React.createElement(X, { size: 18 })
       ),
       /* @__PURE__ */ React.createElement("h2", { style: { fontFamily: FONT.display, color: PAL.tinta }, className: "text-xl font-medium mb-1 pr-8" }, "¿Cómo funciona?"),
-      /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.6 }, className: "text-sm mb-5" }, "Las clases no arrancan solas — sois vosotros quienes las hacéis realidad."),
+      /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.76 }, className: "text-sm mb-5" }, "Las clases no arrancan solas — sois vosotros quienes las hacéis realidad."),
       /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 16 } }, pasos.map((paso, i) => /* @__PURE__ */ React.createElement("div", { key: i, style: { display: "flex", flexDirection: "row", gap: 12, alignItems: "flex-start" } }, /* @__PURE__ */ React.createElement(
         "div",
         {
@@ -1005,8 +1005,8 @@ function ModalComoFunciona({ onCerrar }) {
           className: "text-xs font-medium"
         },
         i + 1
-      ), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, fontFamily: FONT.body }, className: "text-sm font-medium" }, paso.titulo), /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.7 }, className: "text-sm leading-relaxed" }, paso.texto))))),
-      /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.45 }, className: "text-[11px] text-center mt-6" }, '¿Ya hay una clase "en marcha"? Puedes apuntarte directamente, sin esperar a nadie.')
+      ), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, fontFamily: FONT.body }, className: "text-sm font-medium" }, paso.titulo), /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.85 }, className: "text-sm leading-relaxed" }, paso.texto))))),
+      /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.65 }, className: "text-[13px] text-center mt-6" }, '¿Ya hay una clase "en marcha"? Puedes apuntarte directamente, sin esperar a nadie.')
     )
   );
 }
@@ -1072,7 +1072,7 @@ function FilaHora({ hora, dia, activas, propuestas, estado, onAbrirModal }) {
   return /* @__PURE__ */ React.createElement("div", { className: "flex gap-3 items-start" }, /* @__PURE__ */ React.createElement(
     "div",
     {
-      style: { fontFamily: FONT.mono, color: PAL.tinta, opacity: 0.75, fontWeight: 700 },
+      style: { fontFamily: FONT.mono, color: PAL.tinta, opacity: 0.88, fontWeight: 700 },
       className: "text-base pt-3.5 w-16 shrink-0 text-right"
     },
     hora
@@ -1236,8 +1236,8 @@ function ModalHueco({ info, estado, catalogo, onCerrar, onUnirseActiva, onUnirse
           className: "w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl p-6 relative overflow-y-auto my-auto sm:my-0"
         },
         /* @__PURE__ */ React.createElement("h2", { style: { fontFamily: FONT.display, color: PAL.tinta }, className: "text-2xl font-medium mb-1" }, "¿Revisamos los datos?"),
-        /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.6 }, className: "text-sm mb-5" }, "Comprueba que está todo bien escrito antes de enviarlo — sobre todo el teléfono."),
-        /* @__PURE__ */ React.createElement("div", { style: { background: PAL.blanco, border: `1px solid ${PAL.linea}` }, className: "rounded-2xl p-4 mb-5" }, /* @__PURE__ */ React.createElement("div", { style: { fontFamily: FONT.mono, color: PAL.tinta, opacity: 0.5 }, className: "text-[11px] uppercase tracking-widest mb-2" }, info.dia, " · ", info.hora, info.sala ? ` · ${info.sala}` : ""), /* @__PURE__ */ React.createElement("div", { className: "flex flex-wrap gap-1.5 mb-4" }, nombresActividades.map((n, i) => /* @__PURE__ */ React.createElement(
+        /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.76 }, className: "text-sm mb-5" }, "Comprueba que está todo bien escrito antes de enviarlo — sobre todo el teléfono."),
+        /* @__PURE__ */ React.createElement("div", { style: { background: PAL.blanco, border: `1px solid ${PAL.linea}` }, className: "rounded-2xl p-4 mb-5" }, /* @__PURE__ */ React.createElement("div", { style: { fontFamily: FONT.mono, color: PAL.tinta, opacity: 0.7 }, className: "text-[13px] uppercase tracking-widest mb-2" }, info.dia, " · ", info.hora, info.sala ? ` · ${info.sala}` : ""), /* @__PURE__ */ React.createElement("div", { className: "flex flex-wrap gap-1.5 mb-4" }, nombresActividades.map((n, i) => /* @__PURE__ */ React.createElement(
           "span",
           {
             key: i,
@@ -1289,16 +1289,16 @@ function ModalHueco({ info, estado, catalogo, onCerrar, onUnirseActiva, onUnirse
         },
         /* @__PURE__ */ React.createElement(X, { size: 18 })
       ),
-      /* @__PURE__ */ React.createElement("div", { style: { fontFamily: FONT.mono, color: PAL.tinta, opacity: 0.5 }, className: "text-[11px] uppercase tracking-widest pr-10" }, info.dia, " · ", info.hora, info.sala ? ` · ${info.sala}` : ""),
+      /* @__PURE__ */ React.createElement("div", { style: { fontFamily: FONT.mono, color: PAL.tinta, opacity: 0.7 }, className: "text-[13px] uppercase tracking-widest pr-10" }, info.dia, " · ", info.hora, info.sala ? ` · ${info.sala}` : ""),
       /* @__PURE__ */ React.createElement("h2", { style: { fontFamily: FONT.display, color: PAL.tinta }, className: "text-2xl font-medium mt-1 mb-4 pr-8" }, info.modo === "vacio" ? "Propón una actividad" : info.nombreActividad),
-      info.modo === "activa" && /* @__PURE__ */ React.createElement("div", { className: "mb-5" }, infoInscritosActiva.lleno ? /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.75 }, className: "text-sm mb-2 leading-relaxed" }, "Esta clase está completa."), /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.75 }, className: "text-sm leading-relaxed" }, "Déjanos tus datos y te apuntamos en la lista de espera — te diremos tu posición al momento, y te avisaremos si se libera un hueco.")) : /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.75 }, className: "text-sm leading-relaxed" }, "Esta clase ya está funcionando. Déjanos tus datos y te avisaremos para confirmar tu plaza.")),
-      info.modo === "propuesta" && /* @__PURE__ */ React.createElement("div", { className: "mb-5" }, /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.75 }, className: "text-sm mb-3 leading-relaxed" }, "Aún no hay grupo suficiente. Súmate y ayuda a que esta clase arranque."), /* @__PURE__ */ React.createElement(DotsProgreso, { n: contarInteresados(estado, info.activityId) })),
-      info.modo === "vacio" && /* @__PURE__ */ React.createElement("div", { className: "mb-5" }, /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.75 }, className: "text-sm mb-3 leading-relaxed" }, "¿Qué actividad te gustaría hacer aquí? Puedes añadir más de una si te vale cualquiera de ellas."), listaActividades.length > 0 && /* @__PURE__ */ React.createElement("div", { className: "flex flex-wrap gap-1.5 mb-2" }, listaActividades.map((a) => /* @__PURE__ */ React.createElement(
+      info.modo === "activa" && /* @__PURE__ */ React.createElement("div", { className: "mb-5" }, infoInscritosActiva.lleno ? /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.88 }, className: "text-sm mb-2 leading-relaxed" }, "Esta clase está completa."), /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.88 }, className: "text-sm mb-2 leading-relaxed" }, "Déjanos tus datos y te apuntamos en la lista de espera."), /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.88 }, className: "text-sm leading-relaxed" }, "Te diremos tu posición al momento, y te avisaremos si se libera un hueco.")) : /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.88 }, className: "text-sm leading-relaxed" }, "Esta clase ya está funcionando. Déjanos tus datos y te avisaremos para confirmar tu plaza.")),
+      info.modo === "propuesta" && /* @__PURE__ */ React.createElement("div", { className: "mb-5" }, /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.88 }, className: "text-sm mb-3 leading-relaxed" }, "Aún no hay grupo suficiente. Súmate y ayuda a que esta clase arranque."), /* @__PURE__ */ React.createElement(DotsProgreso, { n: contarInteresados(estado, info.activityId) })),
+      info.modo === "vacio" && /* @__PURE__ */ React.createElement("div", { className: "mb-5" }, /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.88 }, className: "text-sm mb-3 leading-relaxed" }, "¿Qué actividad te gustaría hacer aquí? Puedes añadir más de una si te vale cualquiera de ellas."), listaActividades.length > 0 && /* @__PURE__ */ React.createElement("div", { className: "flex flex-wrap gap-1.5 mb-2" }, listaActividades.map((a) => /* @__PURE__ */ React.createElement(
         "span",
         {
           key: a,
           style: { background: PAL.tinta, color: PAL.papel, fontFamily: FONT.mono },
-          className: "text-[11px] px-2.5 py-1 rounded-full flex items-center gap-1.5"
+          className: "text-[13px] px-2.5 py-1 rounded-full flex items-center gap-1.5"
         },
         a,
         /* @__PURE__ */ React.createElement("button", { onClick: () => quitarDeLaLista(a), className: "opacity-70 hover:opacity-100" }, /* @__PURE__ */ React.createElement(X, { size: 11 }))
@@ -1307,7 +1307,7 @@ function ModalHueco({ info, estado, catalogo, onCerrar, onUnirseActiva, onUnirse
         {
           key: a,
           style: { background: PAL.mostaza, color: PAL.tinta, fontFamily: FONT.mono },
-          className: "text-[11px] px-2.5 py-1 rounded-full flex items-center gap-1.5"
+          className: "text-[13px] px-2.5 py-1 rounded-full flex items-center gap-1.5"
         },
         a,
         " · pendiente",
@@ -1348,13 +1348,13 @@ function ModalHueco({ info, estado, catalogo, onCerrar, onUnirseActiva, onUnirse
           style: { borderColor: PAL.linea, fontFamily: FONT.body },
           className: "w-full px-4 py-3 rounded-xl border bg-white text-sm outline-none focus:border-current"
         }
-      ), /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.45 }, className: "text-[11px] mt-1.5" }, "Esta propuesta no se publica al momento: la revisamos y la activamos si encaja."))),
-      /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.6 }, className: "text-xs mb-2" }, personas.length === 0 ? "Tus datos: (si quieres apuntar a más personas contigo, añádelos también)" : "Añade a la siguiente persona"), personas.length > 0 && /* @__PURE__ */ React.createElement("div", { className: "flex flex-wrap gap-1.5 mb-2.5" }, personas.map((p, i) => /* @__PURE__ */ React.createElement(
+      ), /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.65 }, className: "text-[13px] mt-1.5" }, "Esta propuesta no se publica al momento: la revisamos y la activamos si encaja."))),
+      /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.76 }, className: "text-xs mb-2" }, personas.length === 0 ? "Tus datos: (si quieres apuntar a más personas contigo, añádelos también)" : "Añade a la siguiente persona"), personas.length > 0 && /* @__PURE__ */ React.createElement("div", { className: "flex flex-wrap gap-1.5 mb-2.5" }, personas.map((p, i) => /* @__PURE__ */ React.createElement(
         "span",
         {
           key: i,
           style: { background: PAL.petroleo, color: PAL.papel, fontFamily: FONT.mono },
-          className: "text-[11px] px-2.5 py-1 rounded-full flex items-center gap-1.5"
+          className: "text-[13px] px-2.5 py-1 rounded-full flex items-center gap-1.5"
         },
         p.nombre,
         /* @__PURE__ */ React.createElement("button", { onClick: () => quitarPersona(i), className: "opacity-70 hover:opacity-100" }, /* @__PURE__ */ React.createElement(X, { size: 11 }))
@@ -1368,7 +1368,7 @@ function ModalHueco({ info, estado, catalogo, onCerrar, onUnirseActiva, onUnirse
           title: "Añadir a otra persona"
         },
         /* @__PURE__ */ React.createElement(Plus, { size: 16 })
-      )), telefono.trim().length > 0 && !telefonoValido(telefono) && /* @__PURE__ */ React.createElement("p", { style: { color: PAL.carmin, opacity: 0.7 }, className: "text-[11px]" }, "El teléfono debe tener al menos 9 dígitos (se admite el prefijo internacional, ej. +34).")), /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.4 }, className: "text-[11px] mt-2" }, "¿Vienen amigos y/o hijos contigo? Añádelos uno a uno con su nombre (puedes repetir el mismo teléfono si es el contacto familiar).")),
+      )), telefono.trim().length > 0 && !telefonoValido(telefono) && /* @__PURE__ */ React.createElement("p", { style: { color: PAL.carmin, opacity: 0.85 }, className: "text-[13px]" }, "El teléfono debe tener al menos 9 dígitos (se admite el prefijo internacional, ej. +34).")), /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.62 }, className: "text-[13px] mt-2" }, "¿Vienen amigos y/o hijos contigo? Añádelos uno a uno con su nombre (puedes repetir el mismo teléfono si es el contacto familiar).")),
       (() => {
         const lista = listaFinal;
         const sugerencias = sugerenciasFinal;
@@ -1394,11 +1394,11 @@ function ModalHueco({ info, estado, catalogo, onCerrar, onUnirseActiva, onUnirse
           etiqueta
         );
       })(),
-      /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.4 }, className: "text-[11px] text-center mt-3" }, "Solo usaremos tu teléfono para avisarte de esta clase.", " ", /* @__PURE__ */ React.createElement(
+      /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.62 }, className: "text-[13px] text-center mt-3" }, "Solo usaremos tu teléfono para avisarte de esta clase.", " ", /* @__PURE__ */ React.createElement(
         "button",
         {
           onClick: () => setMostrarPrivacidad(true),
-          style: { color: PAL.tinta, opacity: 0.7 },
+          style: { color: PAL.tinta, opacity: 0.85 },
           className: "underline"
         },
         "Ver política de privacidad"
@@ -1432,7 +1432,7 @@ function ModalPrivacidad({ onCerrar }) {
         /* @__PURE__ */ React.createElement(X, { size: 18 })
       ),
       /* @__PURE__ */ React.createElement("h2", { style: { fontFamily: FONT.display, color: PAL.tinta }, className: "text-xl font-medium mb-4 pr-8" }, "Política de privacidad"),
-      /* @__PURE__ */ React.createElement("div", { style: { color: PAL.tinta, opacity: 0.75 }, className: "text-sm space-y-3 leading-relaxed" }, /* @__PURE__ */ React.createElement("p", null, /* @__PURE__ */ React.createElement("strong", null, "Responsable:"), " Baildanzas (escuela de danza y arte), sedes en Madrid."), /* @__PURE__ */ React.createElement("p", null, /* @__PURE__ */ React.createElement("strong", null, "¿Qué datos pedimos?"), " Solo tu nombre de pila y tu número de teléfono, y los de las personas que apuntes contigo (amigos o hijos)."), /* @__PURE__ */ React.createElement("p", null, /* @__PURE__ */ React.createElement("strong", null, "¿Para qué los usamos?"), " Únicamente para gestionar tu propuesta o inscripción a una clase: contarte cuántos sois, avisarte cuando la clase arranca, y confirmar tu plaza o tu puesto en lista de espera."), /* @__PURE__ */ React.createElement("p", null, /* @__PURE__ */ React.createElement("strong", null, "¿Con quién los compartimos?"), " Con nadie. No cedemos ni vendemos tus datos a terceros, ni se usan con fines publicitarios."), /* @__PURE__ */ React.createElement("p", null, /* @__PURE__ */ React.createElement("strong", null, "¿Cuánto tiempo los guardamos?"), " Mientras seas alumno/a activo/a o tengas una propuesta en marcha. Puedes pedirnos que te demos de baja en cualquier momento."), /* @__PURE__ */ React.createElement("p", null, /* @__PURE__ */ React.createElement("strong", null, "Tus derechos:"), " Puedes pedirnos acceder a tus datos, corregirlos o eliminarlos por completo cuando quieras, escribiendo a Baildanzas directamente."), /* @__PURE__ */ React.createElement("p", null, /* @__PURE__ */ React.createElement("strong", null, "Contacto:"), " baildanzas@gmail.com"))
+      /* @__PURE__ */ React.createElement("div", { style: { color: PAL.tinta, opacity: 0.88 }, className: "text-sm space-y-3 leading-relaxed" }, /* @__PURE__ */ React.createElement("p", null, /* @__PURE__ */ React.createElement("strong", null, "Responsable:"), " Baildanzas (escuela de danza y arte), sedes en Madrid."), /* @__PURE__ */ React.createElement("p", null, /* @__PURE__ */ React.createElement("strong", null, "¿Qué datos pedimos?"), " Solo tu nombre de pila y tu número de teléfono, y los de las personas que apuntes contigo (amigos o hijos)."), /* @__PURE__ */ React.createElement("p", null, /* @__PURE__ */ React.createElement("strong", null, "¿Para qué los usamos?"), " Únicamente para gestionar tu propuesta o inscripción a una clase: contarte cuántos sois, avisarte cuando la clase arranca, y confirmar tu plaza o tu puesto en lista de espera."), /* @__PURE__ */ React.createElement("p", null, /* @__PURE__ */ React.createElement("strong", null, "¿Con quién los compartimos?"), " Con nadie. No cedemos ni vendemos tus datos a terceros, ni se usan con fines publicitarios."), /* @__PURE__ */ React.createElement("p", null, /* @__PURE__ */ React.createElement("strong", null, "¿Cuánto tiempo los guardamos?"), " Mientras seas alumno/a activo/a o tengas una propuesta en marcha. Puedes pedirnos que te demos de baja en cualquier momento."), /* @__PURE__ */ React.createElement("p", null, /* @__PURE__ */ React.createElement("strong", null, "Tus derechos:"), " Puedes pedirnos acceder a tus datos, corregirlos o eliminarlos por completo cuando quieras, escribiendo a Baildanzas directamente."), /* @__PURE__ */ React.createElement("p", null, /* @__PURE__ */ React.createElement("strong", null, "Contacto:"), " baildanzas@gmail.com"))
     )
   );
 }
@@ -1443,7 +1443,7 @@ function Campo({ icon, valor, onCambio, placeholder, tipo = "text" }) {
       style: { borderColor: PAL.linea, background: PAL.blanco },
       className: "flex items-center gap-2.5 px-4 py-3 rounded-xl border"
     },
-    /* @__PURE__ */ React.createElement("span", { style: { color: PAL.tinta, opacity: 0.35 } }, icon),
+    /* @__PURE__ */ React.createElement("span", { style: { color: PAL.tinta, opacity: 0.6 } }, icon),
     /* @__PURE__ */ React.createElement(
       "input",
       {
@@ -1559,7 +1559,7 @@ function PanelGestion({
         className: "p-1.5"
       },
       /* @__PURE__ */ React.createElement(Download, { size: 19 })
-    ), /* @__PURE__ */ React.createElement("button", { onClick: onCerrar, style: { color: PAL.tinta, opacity: 0.5 } }, /* @__PURE__ */ React.createElement(X, { size: 20 })))),
+    ), /* @__PURE__ */ React.createElement("button", { onClick: onCerrar, style: { color: PAL.tinta, opacity: 0.7 } }, /* @__PURE__ */ React.createElement(X, { size: 20 })))),
     /* @__PURE__ */ React.createElement("div", { className: "flex gap-2 mb-5 flex-wrap" }, Object.entries(sedes).map(([id, s]) => {
       const activo = Number(id) === sedeId;
       return /* @__PURE__ */ React.createElement(
@@ -1573,7 +1573,7 @@ function PanelGestion({
             color: activo ? PAL.papel : PAL.petroleo,
             border: `1px solid ${PAL.petroleo}`
           },
-          className: "px-3.5 py-1.5 text-[11px] uppercase tracking-widest rounded-full flex items-center gap-1.5"
+          className: "px-3.5 py-1.5 text-[13px] uppercase tracking-widest rounded-full flex items-center gap-1.5"
         },
         /* @__PURE__ */ React.createElement(MapPin, { size: 12 }),
         s.nombre
@@ -1601,13 +1601,13 @@ function PanelGestion({
           border: `1px solid ${PAL.tinta}`,
           marginRight: badgeExtra ? "10px" : 0
         },
-        className: "relative px-3.5 py-1.5 text-[11px] uppercase tracking-wider rounded-full flex items-center gap-1.5"
+        className: "relative px-3.5 py-1.5 text-[13px] uppercase tracking-wider rounded-full flex items-center gap-1.5"
       },
       !!badgeExtra && /* @__PURE__ */ React.createElement(
         "span",
         {
           style: { background: PAL.carmin, border: `1.5px solid ${PAL.papel}` },
-          className: "absolute -top-2 -right-2 min-w-[18px] h-[18px] px-1 rounded-full text-white text-[10px] font-bold flex items-center justify-center leading-none z-10",
+          className: "absolute -top-2 -right-2 min-w-[18px] h-[18px] px-1 rounded-full text-white text-[12px] font-bold flex items-center justify-center leading-none z-10",
           title: "Nuevas desde la última vez que entraste"
         },
         badgeExtra
@@ -1622,8 +1622,8 @@ function PanelGestion({
         badge
       )
     ))),
-    tab === "avisos" && /* @__PURE__ */ React.createElement("div", { className: "space-y-3" }, pendientes.length === 0 && /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.5 }, className: "text-sm" }, "No hay avisos pendientes. Aquí verás cuándo alguien se apunta o cuándo una propuesta llega a ", UMBRAL_PROPUESTA, " personas."), pendientes.map((a) => /* @__PURE__ */ React.createElement("div", { key: a.id, style: { background: PAL.blanco, border: `1px solid ${PAL.linea}` }, className: "p-4 rounded-2xl" }, /* @__PURE__ */ React.createElement("div", { className: "flex items-start justify-between gap-2" }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { fontFamily: FONT.display }, className: "font-medium text-sm" }, a.nombre), /* @__PURE__ */ React.createElement("div", { style: { color: PAL.carmin }, className: "text-xs mt-0.5" }, a.tipo), /* @__PURE__ */ React.createElement("div", { style: { fontFamily: FONT.mono, opacity: 0.5 }, className: "text-[10px] mt-1" }, a.dia, " · ", a.hora)), /* @__PURE__ */ React.createElement("button", { onClick: () => onResolver(a.id), style: { color: PAL.petroleo }, className: "p-1.5 shrink-0" }, /* @__PURE__ */ React.createElement(Check, { size: 16 }))), /* @__PURE__ */ React.createElement("div", { className: "mt-2" }, (a.contactos || (a.contacto ? [a.contacto] : [])).map((c, i) => /* @__PURE__ */ React.createElement(FilaPersona, { key: i, nombre: c.nombre, telefono: c.telefono, ts: c.ts }))))), resueltos.length > 0 && /* @__PURE__ */ React.createElement("details", { className: "pt-2" }, /* @__PURE__ */ React.createElement("summary", { style: { color: PAL.tinta, opacity: 0.4 }, className: "text-xs cursor-pointer" }, "Resueltos (", resueltos.length, ")"), /* @__PURE__ */ React.createElement("div", { className: "mt-2 space-y-2" }, resueltos.map((a) => /* @__PURE__ */ React.createElement("div", { key: a.id, style: { opacity: 0.45 }, className: "text-xs" }, a.nombre, " — ", a.dia, " ", a.hora))))),
-    tab === "buscar" && /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.5 }, className: "text-xs mb-3" }, "Busca por el nombre o el teléfono que os haya dado la persona para ver en qué está apuntada (en cualquiera de las dos sedes) y darla de baja si os lo pide."), /* @__PURE__ */ React.createElement("div", { className: "flex gap-2 mb-4" }, /* @__PURE__ */ React.createElement(
+    tab === "avisos" && /* @__PURE__ */ React.createElement("div", { className: "space-y-3" }, pendientes.length === 0 && /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.7 }, className: "text-sm" }, "No hay avisos pendientes. Aquí verás cuándo alguien se apunta o cuándo una propuesta llega a ", UMBRAL_PROPUESTA, " personas."), pendientes.map((a) => /* @__PURE__ */ React.createElement("div", { key: a.id, style: { background: PAL.blanco, border: `1px solid ${PAL.linea}` }, className: "p-4 rounded-2xl" }, /* @__PURE__ */ React.createElement("div", { className: "flex items-start justify-between gap-2" }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { fontFamily: FONT.display }, className: "font-medium text-sm" }, a.nombre), /* @__PURE__ */ React.createElement("div", { style: { color: PAL.carmin }, className: "text-xs mt-0.5" }, a.tipo), /* @__PURE__ */ React.createElement("div", { style: { fontFamily: FONT.mono, opacity: 0.7 }, className: "text-[12px] mt-1" }, a.dia, " · ", a.hora)), /* @__PURE__ */ React.createElement("button", { onClick: () => onResolver(a.id), style: { color: PAL.petroleo }, className: "p-1.5 shrink-0" }, /* @__PURE__ */ React.createElement(Check, { size: 16 }))), /* @__PURE__ */ React.createElement("div", { className: "mt-2" }, (a.contactos || (a.contacto ? [a.contacto] : [])).map((c, i) => /* @__PURE__ */ React.createElement(FilaPersona, { key: i, nombre: c.nombre, telefono: c.telefono, ts: c.ts }))))), resueltos.length > 0 && /* @__PURE__ */ React.createElement("details", { className: "pt-2" }, /* @__PURE__ */ React.createElement("summary", { style: { color: PAL.tinta, opacity: 0.62 }, className: "text-xs cursor-pointer" }, "Resueltos (", resueltos.length, ")"), /* @__PURE__ */ React.createElement("div", { className: "mt-2 space-y-2" }, resueltos.map((a) => /* @__PURE__ */ React.createElement("div", { key: a.id, style: { opacity: 0.65 }, className: "text-xs" }, a.nombre, " — ", a.dia, " ", a.hora))))),
+    tab === "buscar" && /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.7 }, className: "text-xs mb-3" }, "Busca por el nombre o el teléfono que os haya dado la persona para ver en qué está apuntada (en cualquiera de las dos sedes) y darla de baja si os lo pide."), /* @__PURE__ */ React.createElement("div", { className: "flex gap-2 mb-4" }, /* @__PURE__ */ React.createElement(
       "input",
       {
         value: telefonoBuscado,
@@ -1644,7 +1644,7 @@ function PanelGestion({
         className: "px-4 rounded-lg text-white text-sm shrink-0"
       },
       "Buscar"
-    )), resultadosBusqueda !== null && resultadosBusqueda.length === 0 && /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.5 }, className: "text-sm" }, "No hay ninguna inscripción con ese teléfono."), /* @__PURE__ */ React.createElement("div", { className: "space-y-2.5" }, (resultadosBusqueda || []).map((r) => {
+    )), resultadosBusqueda !== null && resultadosBusqueda.length === 0 && /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.7 }, className: "text-sm" }, "No hay ninguna inscripción con ese teléfono."), /* @__PURE__ */ React.createElement("div", { className: "space-y-2.5" }, (resultadosBusqueda || []).map((r) => {
       const colorTipo = r.tipo === "espera" ? PAL.carmin : r.tipo === "activa" ? PAL.petroleo : PAL.mostaza;
       const etiquetaTipo = r.tipo === "espera" ? "Lista de espera" : r.tipo === "activa" ? "Clase activa" : "Propuesta";
       const key = `${r.activityId}-${r.idxPersona}`;
@@ -1675,7 +1675,7 @@ function PanelGestion({
             className: "w-full px-3 py-2 rounded-lg border text-sm",
             style: { borderColor: PAL.linea }
           }
-        ), editando.nombre.trim().length > 1 && !telefonoValido(editando.telefono) && /* @__PURE__ */ React.createElement("p", { style: { color: PAL.carmin }, className: "text-[11px]" }, "El teléfono debe tener al menos 9 dígitos."), /* @__PURE__ */ React.createElement("div", { className: "flex gap-2" }, /* @__PURE__ */ React.createElement(
+        ), editando.nombre.trim().length > 1 && !telefonoValido(editando.telefono) && /* @__PURE__ */ React.createElement("p", { style: { color: PAL.carmin }, className: "text-[13px]" }, "El teléfono debe tener al menos 9 dígitos."), /* @__PURE__ */ React.createElement("div", { className: "flex gap-2" }, /* @__PURE__ */ React.createElement(
           "button",
           {
             onClick: () => setEditando(null),
@@ -1709,7 +1709,7 @@ function PanelGestion({
             className: "w-7 h-7 rounded-full flex items-center justify-center text-xs font-medium shrink-0"
           },
           (r.persona.nombre || "?").trim().charAt(0).toUpperCase()
-        ), /* @__PURE__ */ React.createElement("div", { className: "min-w-0" }, /* @__PURE__ */ React.createElement("div", { style: { color: PAL.tinta }, className: "text-sm font-medium truncate" }, r.persona.nombre), /* @__PURE__ */ React.createElement("div", { style: { fontFamily: FONT.mono, color: PAL.tinta, opacity: 0.55 }, className: "text-[11px] truncate" }, r.persona.telefono, r.persona.ts && /* @__PURE__ */ React.createElement("span", { className: "opacity-70" }, " · ", formatearFechaHora(r.persona.ts))))), /* @__PURE__ */ React.createElement("div", { className: "flex items-center gap-1.5 shrink-0" }, /* @__PURE__ */ React.createElement(
+        ), /* @__PURE__ */ React.createElement("div", { className: "min-w-0" }, /* @__PURE__ */ React.createElement("div", { style: { color: PAL.tinta }, className: "text-sm font-medium truncate" }, r.persona.nombre), /* @__PURE__ */ React.createElement("div", { style: { fontFamily: FONT.mono, color: PAL.tinta, opacity: 0.73 }, className: "text-[13px] truncate" }, r.persona.telefono, r.persona.ts && /* @__PURE__ */ React.createElement("span", { className: "opacity-70" }, " · ", formatearFechaHora(r.persona.ts))))), /* @__PURE__ */ React.createElement("div", { className: "flex items-center gap-1.5 shrink-0" }, /* @__PURE__ */ React.createElement(
           "button",
           {
             onClick: () => setEditando({
@@ -1746,19 +1746,19 @@ function PanelGestion({
             className: "mt-2.5 pt-2.5 border-t flex items-center gap-1.5 flex-wrap"
           },
           /* @__PURE__ */ React.createElement("span", { style: { fontFamily: FONT.display, color: PAL.tinta }, className: "text-sm font-medium" }, r.nombre),
-          /* @__PURE__ */ React.createElement("span", { style: { color: PAL.tinta, opacity: 0.45 }, className: "text-xs" }, "· ", r.sedeNombre, " · ", r.dia, " ", r.hora),
+          /* @__PURE__ */ React.createElement("span", { style: { color: PAL.tinta, opacity: 0.65 }, className: "text-xs" }, "· ", r.sedeNombre, " · ", r.dia, " ", r.hora),
           /* @__PURE__ */ React.createElement(
             "span",
             {
               style: { background: colorTipo, color: PAL.blanco },
-              className: "text-[10px] px-2 py-0.5 rounded-full font-medium ml-auto"
+              className: "text-[12px] px-2 py-0.5 rounded-full font-medium ml-auto"
             },
             etiquetaTipo
           )
         )
       );
     }))),
-    tab === "horario" && /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { background: PAL.blanco, border: `1px solid ${PAL.linea}` }, className: "p-4 rounded-2xl mb-5" }, /* @__PURE__ */ React.createElement("div", { style: { fontFamily: FONT.mono, opacity: 0.5 }, className: "text-[11px] uppercase tracking-widest mb-3" }, "Añadir clase fija"), /* @__PURE__ */ React.createElement("div", { className: "grid grid-cols-2 gap-2 mb-2" }, /* @__PURE__ */ React.createElement("select", { value: nDia, onChange: (e) => setNDia(e.target.value), className: "px-3 py-2 rounded-lg border text-sm", style: { borderColor: PAL.linea } }, diasSede.map((d) => /* @__PURE__ */ React.createElement("option", { key: d }, d))), /* @__PURE__ */ React.createElement(
+    tab === "horario" && /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { background: PAL.blanco, border: `1px solid ${PAL.linea}` }, className: "p-4 rounded-2xl mb-5" }, /* @__PURE__ */ React.createElement("div", { style: { fontFamily: FONT.mono, opacity: 0.7 }, className: "text-[13px] uppercase tracking-widest mb-3" }, "Añadir clase fija"), /* @__PURE__ */ React.createElement("div", { className: "grid grid-cols-2 gap-2 mb-2" }, /* @__PURE__ */ React.createElement("select", { value: nDia, onChange: (e) => setNDia(e.target.value), className: "px-3 py-2 rounded-lg border text-sm", style: { borderColor: PAL.linea } }, diasSede.map((d) => /* @__PURE__ */ React.createElement("option", { key: d }, d))), /* @__PURE__ */ React.createElement(
       "input",
       {
         value: nNombre,
@@ -1767,7 +1767,7 @@ function PanelGestion({
         className: "px-3 py-2 rounded-lg border text-sm",
         style: { borderColor: PAL.linea }
       }
-    )), /* @__PURE__ */ React.createElement("div", { className: "grid grid-cols-2 gap-2 mb-2" }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("label", { style: { color: PAL.tinta, opacity: 0.5 }, className: "text-[10px] block mb-0.5" }, "Empieza"), /* @__PURE__ */ React.createElement(
+    )), /* @__PURE__ */ React.createElement("div", { className: "grid grid-cols-2 gap-2 mb-2" }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("label", { style: { color: PAL.tinta, opacity: 0.7 }, className: "text-[12px] block mb-0.5" }, "Empieza"), /* @__PURE__ */ React.createElement(
       "input",
       {
         type: "time",
@@ -1776,7 +1776,7 @@ function PanelGestion({
         className: "w-full px-3 py-2 rounded-lg border text-sm",
         style: { borderColor: PAL.linea }
       }
-    )), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("label", { style: { color: PAL.tinta, opacity: 0.5 }, className: "text-[10px] block mb-0.5" }, "Termina (opcional)"), /* @__PURE__ */ React.createElement(
+    )), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("label", { style: { color: PAL.tinta, opacity: 0.7 }, className: "text-[12px] block mb-0.5" }, "Termina (opcional)"), /* @__PURE__ */ React.createElement(
       "input",
       {
         type: "time",
@@ -1835,7 +1835,7 @@ function PanelGestion({
     ), errorAnadirHorario && /* @__PURE__ */ React.createElement("p", { style: { color: PAL.carmin }, className: "text-xs mt-2" }, errorAnadirHorario)), /* @__PURE__ */ React.createElement("div", { className: "space-y-2" }, diasSede.map((d) => {
       const horasDelDia = Object.keys(sede.activas[d] || {});
       if (horasDelDia.length === 0) return null;
-      return /* @__PURE__ */ React.createElement("div", { key: d }, /* @__PURE__ */ React.createElement("div", { style: { fontFamily: FONT.mono, opacity: 0.5 }, className: "text-[11px] uppercase tracking-widest mt-3 mb-1" }, d), horasDelDia.sort().map(
+      return /* @__PURE__ */ React.createElement("div", { key: d }, /* @__PURE__ */ React.createElement("div", { style: { fontFamily: FONT.mono, opacity: 0.7 }, className: "text-[13px] uppercase tracking-widest mt-3 mb-1" }, d), horasDelDia.sort().map(
         (h) => sede.activas[d][h].map((act) => {
           const alumnos = interesados[act.id] || [];
           const desplegada = expandidaActiva === act.id;
@@ -1845,7 +1845,7 @@ function PanelGestion({
               onClick: () => setExpandidaActiva(desplegada ? null : act.id),
               className: "w-full flex items-center justify-between gap-2 text-sm text-left"
             },
-            /* @__PURE__ */ React.createElement("span", { className: "min-w-0" }, h, act.horaFin ? `–${act.horaFin}` : "", " — ", act.nombre, " ", act.nivel && /* @__PURE__ */ React.createElement("em", { style: { opacity: 0.6 } }, "(", act.nivel, ")"), act.sala && /* @__PURE__ */ React.createElement("span", { style: { color: PAL.morado, opacity: 0.8 }, className: "text-xs" }, " · ", act.sala)),
+            /* @__PURE__ */ React.createElement("span", { className: "min-w-0" }, h, act.horaFin ? `–${act.horaFin}` : "", " — ", act.nombre, " ", act.nivel && /* @__PURE__ */ React.createElement("em", { style: { opacity: 0.76 } }, "(", act.nivel, ")"), act.sala && /* @__PURE__ */ React.createElement("span", { style: { color: PAL.morado, opacity: 0.8 }, className: "text-xs" }, " · ", act.sala)),
             /* @__PURE__ */ React.createElement(
               "span",
               {
@@ -1869,11 +1869,11 @@ function PanelGestion({
               className: "w-16 px-1.5 py-1 rounded-md border text-xs text-center",
               style: { borderColor: PAL.linea, background: PAL.blanco }
             }
-          ), /* @__PURE__ */ React.createElement("span", { style: { color: PAL.tinta, opacity: 0.5 }, className: "text-[11px]" }, "cupo máximo (vacío = sin límite)"), /* @__PURE__ */ React.createElement(
+          ), /* @__PURE__ */ React.createElement("span", { style: { color: PAL.tinta, opacity: 0.7 }, className: "text-[13px]" }, "cupo máximo (vacío = sin límite)"), /* @__PURE__ */ React.createElement(
             "button",
             {
               onClick: () => onBorrar(d, h, act.id),
-              style: { color: PAL.carmin, opacity: 0.6 },
+              style: { color: PAL.carmin, opacity: 0.76 },
               className: "ml-auto shrink-0",
               title: "Eliminar esta clase del horario"
             },
@@ -1889,7 +1889,7 @@ function PanelGestion({
               tituloQuitar: "Quitar de esta clase",
               onGuardarEdicion: (n, t) => onEditarInteresado(act.id, idx, "interesados", n, t)
             }
-          ))) : /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.4 }, className: "text-xs mb-2" }, "Todavía no hay alumnado apuntado en esta clase."), /* @__PURE__ */ React.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React.createElement(
+          ))) : /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.62 }, className: "text-xs mb-2" }, "Todavía no hay alumnado apuntado en esta clase."), /* @__PURE__ */ React.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React.createElement(
             "input",
             {
               value: nuevoAlumnoNombre,
@@ -1931,9 +1931,9 @@ function PanelGestion({
         })
       ));
     }))),
-    tab === "propuestas" && /* @__PURE__ */ React.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.5 }, className: "text-xs mb-1" }, "Todas las propuestas abiertas del catálogo, con quién se ha apuntado a cada una."), listaPropuestas.length === 0 && /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.5 }, className: "text-sm" }, "No hay ninguna propuesta abierta ahora mismo."), listaPropuestas.slice().sort((a, b) => b.ultimoTs - a.ultimoTs).map((p) => {
+    tab === "propuestas" && /* @__PURE__ */ React.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.7 }, className: "text-xs mb-1" }, "Todas las propuestas abiertas del catálogo, con quién se ha apuntado a cada una."), listaPropuestas.length === 0 && /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.7 }, className: "text-sm" }, "No hay ninguna propuesta abierta ahora mismo."), listaPropuestas.slice().sort((a, b) => b.ultimoTs - a.ultimoTs).map((p) => {
       const duplicados = grupoDuplicado(p).filter((d) => d.id !== p.id);
-      return /* @__PURE__ */ React.createElement("div", { key: p.id, style: { background: PAL.blanco, border: `1.5px dashed ${PAL.mostaza}` }, className: "p-4 rounded-2xl" }, /* @__PURE__ */ React.createElement("div", { className: "flex items-start justify-between gap-2 mb-2" }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { fontFamily: FONT.display }, className: "font-medium text-sm" }, p.nombre), /* @__PURE__ */ React.createElement("div", { style: { fontFamily: FONT.mono, opacity: 0.5 }, className: "text-[10px] mt-1" }, p.dia, " · ", p.hora, p.sala ? ` · ${p.sala}` : "")), /* @__PURE__ */ React.createElement(DotsProgreso, { n: p.personas.length })), duplicados.length > 0 && /* @__PURE__ */ React.createElement("div", { style: { background: PAL.papel, border: `1px solid ${PAL.carmin}` }, className: "rounded-xl p-2.5 mb-3" }, /* @__PURE__ */ React.createElement("p", { style: { color: PAL.carmin }, className: "text-[11px] mb-1.5" }, "Hay ", duplicados.length + 1, ' propuestas de "', p.nombre, '" en este mismo hueco — probablemente por error.'), /* @__PURE__ */ React.createElement(
+      return /* @__PURE__ */ React.createElement("div", { key: p.id, style: { background: PAL.blanco, border: `1.5px dashed ${PAL.mostaza}` }, className: "p-4 rounded-2xl" }, /* @__PURE__ */ React.createElement("div", { className: "flex items-start justify-between gap-2 mb-2" }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { fontFamily: FONT.display }, className: "font-medium text-sm" }, p.nombre), /* @__PURE__ */ React.createElement("div", { style: { fontFamily: FONT.mono, opacity: 0.7 }, className: "text-[12px] mt-1" }, p.dia, " · ", p.hora, p.sala ? ` · ${p.sala}` : "")), /* @__PURE__ */ React.createElement(DotsProgreso, { n: p.personas.length })), duplicados.length > 0 && /* @__PURE__ */ React.createElement("div", { style: { background: PAL.papel, border: `1px solid ${PAL.carmin}` }, className: "rounded-xl p-2.5 mb-3" }, /* @__PURE__ */ React.createElement("p", { style: { color: PAL.carmin }, className: "text-[13px] mb-1.5" }, "Hay ", duplicados.length + 1, ' propuestas de "', p.nombre, '" en este mismo hueco — probablemente por error.'), /* @__PURE__ */ React.createElement(
         "button",
         {
           onClick: () => onFusionarPropuestas(p.dia, p.hora, p.id, duplicados[0].id),
@@ -1945,7 +1945,7 @@ function PanelGestion({
         " persona",
         duplicados[0].personas.length !== 1 ? "s" : "",
         ")"
-      )), p.personas.length === 0 ? /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.4 }, className: "text-xs" }, "Nadie apuntado todavía.") : /* @__PURE__ */ React.createElement("div", null, p.personas.map((persona, idx) => /* @__PURE__ */ React.createElement(
+      )), p.personas.length === 0 ? /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.62 }, className: "text-xs" }, "Nadie apuntado todavía.") : /* @__PURE__ */ React.createElement("div", null, p.personas.map((persona, idx) => /* @__PURE__ */ React.createElement(
         FilaPersona,
         {
           key: idx,
@@ -1956,7 +1956,7 @@ function PanelGestion({
           tituloQuitar: "Dar de baja de esta propuesta",
           onGuardarEdicion: (n, t) => onEditarInteresado(p.id, idx, "interesados", n, t)
         }
-      ))), confirmandoConversion === p.id ? /* @__PURE__ */ React.createElement("div", { style: { background: PAL.papel, border: `1.5px solid ${PAL.petroleo}` }, className: "rounded-xl p-3 mt-3" }, /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta }, className: "text-xs mb-2 leading-relaxed" }, "Vas a convertir ", /* @__PURE__ */ React.createElement("strong", null, '"', p.nombre, '"'), " en clase activa.", " ", p.personas.length === 0 ? "Ahora mismo no hay nadie apuntado todavía." : `${p.personas.length} persona${p.personas.length !== 1 ? "s" : ""} pasará${p.personas.length !== 1 ? "n" : ""} directamente a ser alumnado de esa clase:`), p.personas.length > 0 && /* @__PURE__ */ React.createElement("div", { className: "mb-3" }, /* @__PURE__ */ React.createElement("label", { style: { color: PAL.tinta, opacity: 0.7 }, className: "text-[11px] block mb-1" }, "¿Qué día es la clase de prueba a la que deben confirmar asistencia?"), /* @__PURE__ */ React.createElement(
+      ))), confirmandoConversion === p.id ? /* @__PURE__ */ React.createElement("div", { style: { background: PAL.papel, border: `1.5px solid ${PAL.petroleo}` }, className: "rounded-xl p-3 mt-3" }, /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta }, className: "text-xs mb-2 leading-relaxed" }, "Vas a convertir ", /* @__PURE__ */ React.createElement("strong", null, '"', p.nombre, '"'), " en clase activa.", " ", p.personas.length === 0 ? "Ahora mismo no hay nadie apuntado todavía." : `${p.personas.length} persona${p.personas.length !== 1 ? "s" : ""} pasará${p.personas.length !== 1 ? "n" : ""} directamente a ser alumnado de esa clase:`), p.personas.length > 0 && /* @__PURE__ */ React.createElement("div", { className: "mb-3" }, /* @__PURE__ */ React.createElement("label", { style: { color: PAL.tinta, opacity: 0.85 }, className: "text-[13px] block mb-1" }, "¿Qué día es la clase de prueba a la que deben confirmar asistencia?"), /* @__PURE__ */ React.createElement(
         "input",
         {
           type: "date",
@@ -1965,7 +1965,7 @@ function PanelGestion({
           style: { borderColor: PAL.linea, fontFamily: FONT.body },
           className: "w-full px-3 py-2 rounded-lg border bg-white text-xs outline-none"
         }
-      ), !fechaPrueba && /* @__PURE__ */ React.createElement("p", { style: { color: PAL.mostaza }, className: "text-[10px] mt-1" }, "Indica la fecha para poder avisar por WhatsApp — sin ella, el botón queda desactivado.")), p.personas.length > 0 && /* @__PURE__ */ React.createElement("ul", { className: "mb-3 space-y-1" }, p.personas.map((per, i) => {
+      ), !fechaPrueba && /* @__PURE__ */ React.createElement("p", { style: { color: PAL.mostaza }, className: "text-[12px] mt-1" }, "Indica la fecha para poder avisar por WhatsApp — sin ella, el botón queda desactivado.")), p.personas.length > 0 && /* @__PURE__ */ React.createElement("ul", { className: "mb-3 space-y-1" }, p.personas.map((per, i) => {
         const hayQuorum = p.personas.length >= UMBRAL_PROPUESTA;
         const habilitado = hayQuorum && !!fechaPrueba;
         const fechaFormateada = fechaPrueba ? fechaPrueba.split("-").reverse().join("/") : "";
@@ -1980,14 +1980,14 @@ Gracias a tu propuesta (y a las demás personas interesadas), ya somos suficient
 *Tu clase de prueba* será el *${fechaFormateada}*. Por favor, confírmanos que puedes asistir ese día.
 
 ¡Nos vemos en Baildanzas! 💃🎉`;
-        return /* @__PURE__ */ React.createElement("li", { key: i, className: "flex items-center justify-between gap-2" }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: FONT.mono, color: PAL.tinta, opacity: 0.7 }, className: "text-[11px]" }, "· ", per.nombre, " — ", per.telefono), habilitado ? /* @__PURE__ */ React.createElement(
+        return /* @__PURE__ */ React.createElement("li", { key: i, className: "flex items-center justify-between gap-2" }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: FONT.mono, color: PAL.tinta, opacity: 0.85 }, className: "text-[13px]" }, "· ", per.nombre, " — ", per.telefono), habilitado ? /* @__PURE__ */ React.createElement(
           "a",
           {
             href: enlaceWhatsApp(per.telefono, mensaje),
             target: "_blank",
             rel: "noopener noreferrer",
             style: { background: "#25D366", color: "white" },
-            className: "text-[10px] px-2 py-1 rounded-full font-medium shrink-0 flex items-center gap-1",
+            className: "text-[12px] px-2 py-1 rounded-full font-medium shrink-0 flex items-center gap-1",
             title: "Avisar por WhatsApp"
           },
           /* @__PURE__ */ React.createElement(Phone, { size: 10 }),
@@ -1995,14 +1995,14 @@ Gracias a tu propuesta (y a las demás personas interesadas), ya somos suficient
         ) : /* @__PURE__ */ React.createElement(
           "span",
           {
-            style: { background: PAL.linea, color: PAL.tinta, opacity: 0.5 },
-            className: "text-[10px] px-2 py-1 rounded-full font-medium shrink-0 flex items-center gap-1 cursor-not-allowed",
+            style: { background: PAL.linea, color: PAL.tinta, opacity: 0.7 },
+            className: "text-[12px] px-2 py-1 rounded-full font-medium shrink-0 flex items-center gap-1 cursor-not-allowed",
             title: !hayQuorum ? `Se habilita al llegar a ${UMBRAL_PROPUESTA} personas` : "Indica primero la fecha de la clase de prueba"
           },
           /* @__PURE__ */ React.createElement(Phone, { size: 10 }),
           " WhatsApp"
         ));
-      })), /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.5 }, className: "text-[11px] mb-3" }, "No se pierde a nadie: pasan a la lista de la clase, y además queda una copia en la copia de seguridad exportable."), /* @__PURE__ */ React.createElement("div", { className: "flex gap-2" }, /* @__PURE__ */ React.createElement(
+      })), /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.7 }, className: "text-[13px] mb-3" }, "No se pierde a nadie: pasan a la lista de la clase, y además queda una copia en la copia de seguridad exportable."), /* @__PURE__ */ React.createElement("div", { className: "flex gap-2" }, /* @__PURE__ */ React.createElement(
         "button",
         {
           onClick: () => {
@@ -2042,7 +2042,7 @@ Gracias a tu propuesta (y a las demás personas interesadas), ya somos suficient
         "Convertir en clase activa"
       ));
     })),
-    tab === "sugerencias" && /* @__PURE__ */ React.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.5 }, className: "text-xs mb-1" }, 'Actividades "Otra" propuestas por alumnos. No aparecen en el calendario hasta que las apruebes.'), sugerenciasPendientes.length === 0 && /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.5 }, className: "text-sm" }, "No hay sugerencias pendientes."), sugerenciasPendientes.map((s) => /* @__PURE__ */ React.createElement("div", { key: s.id, style: { background: PAL.blanco, border: `1.5px dashed ${PAL.mostaza}` }, className: "p-4 rounded-2xl" }, /* @__PURE__ */ React.createElement("div", { className: "flex items-start justify-between gap-2" }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { fontFamily: FONT.display }, className: "font-medium text-sm" }, s.nombre), /* @__PURE__ */ React.createElement("div", { style: { fontFamily: FONT.mono, opacity: 0.5 }, className: "text-[10px] mt-1" }, s.dia, " · ", s.hora)), /* @__PURE__ */ React.createElement("div", { className: "flex gap-1.5 shrink-0" }, /* @__PURE__ */ React.createElement(
+    tab === "sugerencias" && /* @__PURE__ */ React.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.7 }, className: "text-xs mb-1" }, 'Actividades "Otra" propuestas por alumnos. No aparecen en el calendario hasta que las apruebes.'), sugerenciasPendientes.length === 0 && /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.7 }, className: "text-sm" }, "No hay sugerencias pendientes."), sugerenciasPendientes.map((s) => /* @__PURE__ */ React.createElement("div", { key: s.id, style: { background: PAL.blanco, border: `1.5px dashed ${PAL.mostaza}` }, className: "p-4 rounded-2xl" }, /* @__PURE__ */ React.createElement("div", { className: "flex items-start justify-between gap-2" }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { fontFamily: FONT.display }, className: "font-medium text-sm" }, s.nombre), /* @__PURE__ */ React.createElement("div", { style: { fontFamily: FONT.mono, opacity: 0.7 }, className: "text-[12px] mt-1" }, s.dia, " · ", s.hora)), /* @__PURE__ */ React.createElement("div", { className: "flex gap-1.5 shrink-0" }, /* @__PURE__ */ React.createElement(
       "button",
       {
         onClick: () => onRechazarSugerencia(s.id),
@@ -2061,7 +2061,7 @@ Gracias a tu propuesta (y a las demás personas interesadas), ya somos suficient
       },
       /* @__PURE__ */ React.createElement(Check, { size: 14 })
     ))), /* @__PURE__ */ React.createElement("div", { className: "mt-2" }, s.personas.map((c, i) => /* @__PURE__ */ React.createElement(FilaPersona, { key: i, nombre: c.nombre, telefono: c.telefono, ts: c.ts })))))),
-    tab === "catalogo" && /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.5 }, className: "text-xs mb-3" }, "Estas son las actividades que la gente puede elegir al proponer algo en un hueco libre."), /* @__PURE__ */ React.createElement("div", { className: "flex gap-2 mb-4" }, /* @__PURE__ */ React.createElement(
+    tab === "catalogo" && /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.7 }, className: "text-xs mb-3" }, "Estas son las actividades que la gente puede elegir al proponer algo en un hueco libre."), /* @__PURE__ */ React.createElement("div", { className: "flex gap-2 mb-4" }, /* @__PURE__ */ React.createElement(
       "input",
       {
         value: nCatalogo,
@@ -2090,7 +2090,7 @@ Gracias a tu propuesta (y a las demás personas interesadas), ya somos suficient
         className: "text-xs px-2.5 py-1.5 rounded-full flex items-center gap-1.5"
       },
       a,
-      /* @__PURE__ */ React.createElement("button", { onClick: () => onBorrarCatalogo(a), style: { color: PAL.carmin, opacity: 0.6 } }, /* @__PURE__ */ React.createElement(X, { size: 12 }))
+      /* @__PURE__ */ React.createElement("button", { onClick: () => onBorrarCatalogo(a), style: { color: PAL.carmin, opacity: 0.76 } }, /* @__PURE__ */ React.createElement(X, { size: 12 }))
     ))))
   ));
 }
@@ -2118,7 +2118,7 @@ function FilaPersona({ nombre, telefono, ts, onQuitar, tituloQuitar, onGuardarEd
         className: "w-full px-3 py-2 rounded-lg border text-sm",
         style: { borderColor: PAL.linea }
       }
-    ), n.trim().length > 1 && !telefonoValido(t) && /* @__PURE__ */ React.createElement("p", { style: { color: PAL.carmin }, className: "text-[11px]" }, "El teléfono debe tener al menos 9 dígitos."), /* @__PURE__ */ React.createElement("div", { className: "flex gap-2" }, /* @__PURE__ */ React.createElement(
+    ), n.trim().length > 1 && !telefonoValido(t) && /* @__PURE__ */ React.createElement("p", { style: { color: PAL.carmin }, className: "text-[13px]" }, "El teléfono debe tener al menos 9 dígitos."), /* @__PURE__ */ React.createElement("div", { className: "flex gap-2" }, /* @__PURE__ */ React.createElement(
       "button",
       {
         onClick: () => {
@@ -2154,11 +2154,11 @@ function FilaPersona({ nombre, telefono, ts, onQuitar, tituloQuitar, onGuardarEd
       "span",
       {
         style: { background: PAL.linea, color: PAL.tinta },
-        className: "w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-medium shrink-0"
+        className: "w-6 h-6 rounded-full flex items-center justify-center text-[13px] font-medium shrink-0"
       },
       (nombre || "?").trim().charAt(0).toUpperCase()
-    ), /* @__PURE__ */ React.createElement("div", { className: "min-w-0" }, /* @__PURE__ */ React.createElement("div", { style: { color: PAL.tinta }, className: "text-sm font-medium truncate" }, nombre), /* @__PURE__ */ React.createElement("div", { style: { fontFamily: FONT.mono, color: PAL.tinta, opacity: 0.55 }, className: "text-[11px] truncate" }, telefono, ts && /* @__PURE__ */ React.createElement("span", { className: "opacity-70" }, " · ", formatearFechaHora(ts))))),
-    /* @__PURE__ */ React.createElement("div", { className: "flex items-center gap-0.5 shrink-0" }, onGuardarEdicion && /* @__PURE__ */ React.createElement("button", { onClick: () => setEditando(true), style: { color: PAL.morado, opacity: 0.65 }, className: "p-1.5", title: "Corregir nombre o teléfono" }, /* @__PURE__ */ React.createElement(Pencil, { size: 13 })), onQuitar && /* @__PURE__ */ React.createElement("button", { onClick: onQuitar, style: { color: PAL.carmin, opacity: 0.55 }, className: "p-1.5", title: tituloQuitar }, /* @__PURE__ */ React.createElement(Trash2, { size: 14 })))
+    ), /* @__PURE__ */ React.createElement("div", { className: "min-w-0" }, /* @__PURE__ */ React.createElement("div", { style: { color: PAL.tinta }, className: "text-sm font-medium truncate" }, nombre), /* @__PURE__ */ React.createElement("div", { style: { fontFamily: FONT.mono, color: PAL.tinta, opacity: 0.73 }, className: "text-[13px] truncate" }, telefono, ts && /* @__PURE__ */ React.createElement("span", { className: "opacity-70" }, " · ", formatearFechaHora(ts))))),
+    /* @__PURE__ */ React.createElement("div", { className: "flex items-center gap-0.5 shrink-0" }, onGuardarEdicion && /* @__PURE__ */ React.createElement("button", { onClick: () => setEditando(true), style: { color: PAL.morado, opacity: 0.8 }, className: "p-1.5", title: "Corregir nombre o teléfono" }, /* @__PURE__ */ React.createElement(Pencil, { size: 13 })), onQuitar && /* @__PURE__ */ React.createElement("button", { onClick: onQuitar, style: { color: PAL.carmin, opacity: 0.73 }, className: "p-1.5", title: tituloQuitar }, /* @__PURE__ */ React.createElement(Trash2, { size: 14 })))
   );
 }
 function Toast({ mensaje }) {
@@ -2219,7 +2219,7 @@ function CandadoPIN({ onCerrar, onDesbloquear }) {
       ),
       /* @__PURE__ */ React.createElement("div", { style: { color: PAL.morado }, className: "flex justify-center mb-3" }, /* @__PURE__ */ React.createElement(Settings, { size: 28 })),
       /* @__PURE__ */ React.createElement("h2", { style: { fontFamily: FONT.display, color: PAL.tinta }, className: "text-xl font-medium text-center mb-1" }, "Acceso del equipo"),
-      /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.6 }, className: "text-sm text-center mb-5" }, "Introduce el PIN para entrar al panel de gestión."),
+      /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.76 }, className: "text-sm text-center mb-5" }, "Introduce el PIN para entrar al panel de gestión."),
       /* @__PURE__ */ React.createElement(
         "input",
         {
