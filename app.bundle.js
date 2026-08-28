@@ -1198,6 +1198,12 @@ function ModalHueco({ info, estado, catalogo, onCerrar, onUnirseActiva, onUnirse
     setTelefono("");
   };
   const quitarPersona = (i) => setPersonas(personas.filter((_, idx) => idx !== i));
+  const editarPersona = (i) => {
+    const p = personas[i];
+    setNombre(p.nombre);
+    setTelefono(p.telefono);
+    setPersonas(personas.filter((_, idx) => idx !== i));
+  };
   const personasFinal = [...personas, ...camposPersonaValidos ? [{ nombre: nombre.trim(), telefono: telefono.trim() }] : []];
   const puedeEnviar = personasFinal.length > 0;
   const listaFinal = [...listaActividades, ...!esOtro && seleccion && !listaActividades.includes(seleccion) ? [seleccion] : []];
@@ -1356,8 +1362,16 @@ function ModalHueco({ info, estado, catalogo, onCerrar, onUnirseActiva, onUnirse
           style: { background: PAL.petroleo, color: PAL.papel, fontFamily: FONT.mono },
           className: "text-[13px] px-2.5 py-1 rounded-full flex items-center gap-1.5"
         },
-        p.nombre,
-        /* @__PURE__ */ React.createElement("button", { onClick: () => quitarPersona(i), className: "opacity-70 hover:opacity-100" }, /* @__PURE__ */ React.createElement(X, { size: 11 }))
+        /* @__PURE__ */ React.createElement(
+          "button",
+          {
+            onClick: () => editarPersona(i),
+            className: "underline decoration-dotted underline-offset-2",
+            title: "Pulsa para corregir este nombre o teléfono"
+          },
+          p.nombre
+        ),
+        /* @__PURE__ */ React.createElement("button", { onClick: () => quitarPersona(i), className: "opacity-70 hover:opacity-100", title: "Quitar" }, /* @__PURE__ */ React.createElement(X, { size: 11 }))
       ))), /* @__PURE__ */ React.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ React.createElement(Campo, { icon: /* @__PURE__ */ React.createElement(User, { size: 14 }), valor: nombre, onCambio: setNombre, placeholder: "Nombre de pila" }), /* @__PURE__ */ React.createElement("div", { className: "flex gap-2" }, /* @__PURE__ */ React.createElement(Campo, { icon: /* @__PURE__ */ React.createElement(Phone, { size: 14 }), valor: telefono, onCambio: setTelefono, placeholder: "Teléfono (con prefijo si es extranjero, ej. +34)", tipo: "tel" }), /* @__PURE__ */ React.createElement(
         "button",
         {
@@ -1394,7 +1408,7 @@ function ModalHueco({ info, estado, catalogo, onCerrar, onUnirseActiva, onUnirse
           etiqueta
         );
       })(),
-      /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.62 }, className: "text-[13px] text-center mt-3" }, "Solo usaremos tu teléfono para avisarte de esta clase.", " ", /* @__PURE__ */ React.createElement(
+      /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.62 }, className: "text-[13px] text-center mt-3" }, "Usaremos tu teléfono para cualquier gestión relacionada con Baildanzas (clases, avisos, dudas). No se cede a terceros.", " ", /* @__PURE__ */ React.createElement(
         "button",
         {
           onClick: () => setMostrarPrivacidad(true),
@@ -1432,7 +1446,7 @@ function ModalPrivacidad({ onCerrar }) {
         /* @__PURE__ */ React.createElement(X, { size: 18 })
       ),
       /* @__PURE__ */ React.createElement("h2", { style: { fontFamily: FONT.display, color: PAL.tinta }, className: "text-xl font-medium mb-4 pr-8" }, "Política de privacidad"),
-      /* @__PURE__ */ React.createElement("div", { style: { color: PAL.tinta, opacity: 0.88 }, className: "text-sm space-y-3 leading-relaxed" }, /* @__PURE__ */ React.createElement("p", null, /* @__PURE__ */ React.createElement("strong", null, "Responsable:"), " Baildanzas (escuela de danza y arte), sedes en Madrid."), /* @__PURE__ */ React.createElement("p", null, /* @__PURE__ */ React.createElement("strong", null, "¿Qué datos pedimos?"), " Solo tu nombre de pila y tu número de teléfono, y los de las personas que apuntes contigo (amigos o hijos)."), /* @__PURE__ */ React.createElement("p", null, /* @__PURE__ */ React.createElement("strong", null, "¿Para qué los usamos?"), " Únicamente para gestionar tu propuesta o inscripción a una clase: contarte cuántos sois, avisarte cuando la clase arranca, y confirmar tu plaza o tu puesto en lista de espera."), /* @__PURE__ */ React.createElement("p", null, /* @__PURE__ */ React.createElement("strong", null, "¿Con quién los compartimos?"), " Con nadie. No cedemos ni vendemos tus datos a terceros, ni se usan con fines publicitarios."), /* @__PURE__ */ React.createElement("p", null, /* @__PURE__ */ React.createElement("strong", null, "¿Cuánto tiempo los guardamos?"), " Mientras seas alumno/a activo/a o tengas una propuesta en marcha. Puedes pedirnos que te demos de baja en cualquier momento."), /* @__PURE__ */ React.createElement("p", null, /* @__PURE__ */ React.createElement("strong", null, "Tus derechos:"), " Puedes pedirnos acceder a tus datos, corregirlos o eliminarlos por completo cuando quieras, escribiendo a Baildanzas directamente."), /* @__PURE__ */ React.createElement("p", null, /* @__PURE__ */ React.createElement("strong", null, "Contacto:"), " baildanzas@gmail.com"))
+      /* @__PURE__ */ React.createElement("div", { style: { color: PAL.tinta, opacity: 0.88 }, className: "text-sm space-y-3 leading-relaxed" }, /* @__PURE__ */ React.createElement("p", null, /* @__PURE__ */ React.createElement("strong", null, "Responsable:"), " Baildanzas (escuela de danza y arte), sedes en Madrid."), /* @__PURE__ */ React.createElement("p", null, /* @__PURE__ */ React.createElement("strong", null, "¿Qué datos pedimos?"), " Solo tu nombre de pila y tu número de teléfono, y los de las personas que apuntes contigo (amigos o hijos)."), /* @__PURE__ */ React.createElement("p", null, /* @__PURE__ */ React.createElement("strong", null, "¿Para qué los usamos?"), " Para cualquier gestión relacionada con Baildanzas: contarte cuántos sois en una propuesta, avisarte cuando una clase arranca, confirmar tu plaza o tu puesto en lista de espera, y resolver dudas o avisos generales de la escuela."), /* @__PURE__ */ React.createElement("p", null, /* @__PURE__ */ React.createElement("strong", null, "¿Con quién los compartimos?"), " Con nadie. No cedemos ni vendemos tus datos a terceros, ni se usan con fines publicitarios."), /* @__PURE__ */ React.createElement("p", null, /* @__PURE__ */ React.createElement("strong", null, "¿Cuánto tiempo los guardamos?"), " Mientras seas alumno/a activo/a o tengas una propuesta en marcha. Puedes pedirnos que te demos de baja en cualquier momento."), /* @__PURE__ */ React.createElement("p", null, /* @__PURE__ */ React.createElement("strong", null, "Tus derechos:"), " Puedes pedirnos acceder a tus datos, corregirlos o eliminarlos por completo cuando quieras, escribiendo a Baildanzas directamente."), /* @__PURE__ */ React.createElement("p", null, /* @__PURE__ */ React.createElement("strong", null, "Contacto:"), " baildanzas@gmail.com"))
     )
   );
 }
