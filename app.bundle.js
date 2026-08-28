@@ -1198,12 +1198,20 @@ function ModalHueco({ info, estado, catalogo, onCerrar, onUnirseActiva, onUnirse
     setTelefono("");
   };
   const quitarPersona = (i) => setPersonas(personas.filter((_, idx) => idx !== i));
-  const editarPersona = (i) => {
-    const p = personas[i];
-    setNombre(p.nombre);
-    setTelefono(p.telefono);
-    setPersonas(personas.filter((_, idx) => idx !== i));
+  const [editandoIndice, setEditandoIndice] = useState(null);
+  const [edNombre, setEdNombre] = useState("");
+  const [edTelefono, setEdTelefono] = useState("");
+  const empezarEdicion = (i) => {
+    setEditandoIndice(i);
+    setEdNombre(personas[i].nombre);
+    setEdTelefono(personas[i].telefono);
   };
+  const guardarEdicion = () => {
+    if (edNombre.trim().length < 2 || !telefonoValido(edTelefono)) return;
+    setPersonas(personas.map((p, idx) => idx === editandoIndice ? { nombre: edNombre.trim(), telefono: edTelefono.trim() } : p));
+    setEditandoIndice(null);
+  };
+  const cancelarEdicion = () => setEditandoIndice(null);
   const personasFinal = [...personas, ...camposPersonaValidos ? [{ nombre: nombre.trim(), telefono: telefono.trim() }] : []];
   const puedeEnviar = personasFinal.length > 0;
   const listaFinal = [...listaActividades, ...!esOtro && seleccion && !listaActividades.includes(seleccion) ? [seleccion] : []];
@@ -1355,24 +1363,90 @@ function ModalHueco({ info, estado, catalogo, onCerrar, onUnirseActiva, onUnirse
           className: "w-full px-4 py-3 rounded-xl border bg-white text-sm outline-none focus:border-current"
         }
       ), /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.65 }, className: "text-[13px] mt-1.5" }, "Esta propuesta no se publica al momento: la revisamos y la activamos si encaja."))),
-      /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.76 }, className: "text-xs mb-2" }, personas.length === 0 ? "Tus datos: (si quieres apuntar a más personas contigo, añádelos también)" : "Añade a la siguiente persona"), personas.length > 0 && /* @__PURE__ */ React.createElement("div", { className: "flex flex-wrap gap-1.5 mb-2.5" }, personas.map((p, i) => /* @__PURE__ */ React.createElement(
-        "span",
-        {
-          key: i,
-          style: { background: PAL.petroleo, color: PAL.papel, fontFamily: FONT.mono },
-          className: "text-[13px] px-2.5 py-1 rounded-full flex items-center gap-1.5"
-        },
-        /* @__PURE__ */ React.createElement(
-          "button",
+      /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.76 }, className: "text-xs mb-2" }, personas.length === 0 ? "Tus datos: (si quieres apuntar a más personas contigo, añádelos también)" : "Añade a la siguiente persona"), personas.length > 0 && /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 6 }, className: "mb-2.5" }, personas.map(
+        (p, i) => editandoIndice === i ? /* @__PURE__ */ React.createElement(
+          "div",
           {
-            onClick: () => editarPersona(i),
-            className: "underline decoration-dotted underline-offset-2",
-            title: "Pulsa para corregir este nombre o teléfono"
+            key: i,
+            style: { background: PAL.blanco, border: `1.5px solid ${PAL.petroleo}` },
+            className: "rounded-xl p-2.5 space-y-1.5"
           },
-          p.nombre
-        ),
-        /* @__PURE__ */ React.createElement("button", { onClick: () => quitarPersona(i), className: "opacity-70 hover:opacity-100", title: "Quitar" }, /* @__PURE__ */ React.createElement(X, { size: 11 }))
-      ))), /* @__PURE__ */ React.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ React.createElement(Campo, { icon: /* @__PURE__ */ React.createElement(User, { size: 14 }), valor: nombre, onCambio: setNombre, placeholder: "Nombre de pila" }), /* @__PURE__ */ React.createElement("div", { className: "flex gap-2" }, /* @__PURE__ */ React.createElement(Campo, { icon: /* @__PURE__ */ React.createElement(Phone, { size: 14 }), valor: telefono, onCambio: setTelefono, placeholder: "Teléfono (con prefijo si es extranjero, ej. +34)", tipo: "tel" }), /* @__PURE__ */ React.createElement(
+          /* @__PURE__ */ React.createElement(
+            "input",
+            {
+              value: edNombre,
+              onChange: (e) => setEdNombre(e.target.value),
+              placeholder: "Nombre de pila",
+              style: { borderColor: PAL.linea, fontFamily: FONT.body },
+              className: "w-full px-2.5 py-1.5 rounded-lg border bg-white text-sm outline-none"
+            }
+          ),
+          /* @__PURE__ */ React.createElement(
+            "input",
+            {
+              value: edTelefono,
+              onChange: (e) => setEdTelefono(e.target.value),
+              placeholder: "Teléfono",
+              style: { borderColor: PAL.linea, fontFamily: FONT.body },
+              className: "w-full px-2.5 py-1.5 rounded-lg border bg-white text-sm outline-none"
+            }
+          ),
+          /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 8 } }, /* @__PURE__ */ React.createElement(
+            "button",
+            {
+              onClick: guardarEdicion,
+              disabled: edNombre.trim().length < 2 || !telefonoValido(edTelefono),
+              style: {
+                background: PAL.petroleo,
+                color: PAL.blanco,
+                opacity: edNombre.trim().length < 2 || !telefonoValido(edTelefono) ? 0.4 : 1,
+                flex: 1,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 4
+              },
+              className: "py-1.5 rounded-lg text-xs font-medium"
+            },
+            /* @__PURE__ */ React.createElement(Check, { size: 13 }),
+            " Guardar"
+          ), /* @__PURE__ */ React.createElement(
+            "button",
+            {
+              onClick: cancelarEdicion,
+              style: { borderColor: PAL.linea, color: PAL.tinta, flex: 1 },
+              className: "py-1.5 rounded-lg border text-xs font-medium"
+            },
+            "Cancelar"
+          ))
+        ) : /* @__PURE__ */ React.createElement(
+          "span",
+          {
+            key: i,
+            style: {
+              background: PAL.petroleo,
+              color: PAL.papel,
+              fontFamily: FONT.mono,
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 6,
+              width: "fit-content"
+            },
+            className: "text-[13px] px-2.5 py-1 rounded-full"
+          },
+          /* @__PURE__ */ React.createElement(
+            "button",
+            {
+              onClick: () => empezarEdicion(i),
+              style: { display: "flex", alignItems: "center", gap: 4 },
+              title: "Pulsa para corregir este nombre o teléfono"
+            },
+            /* @__PURE__ */ React.createElement(Pencil, { size: 10, style: { opacity: 0.7 } }),
+            p.nombre
+          ),
+          /* @__PURE__ */ React.createElement("button", { onClick: () => quitarPersona(i), style: { opacity: 0.7 }, title: "Quitar" }, /* @__PURE__ */ React.createElement(X, { size: 11 }))
+        )
+      )), /* @__PURE__ */ React.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ React.createElement(Campo, { icon: /* @__PURE__ */ React.createElement(User, { size: 14 }), valor: nombre, onCambio: setNombre, placeholder: "Nombre de pila" }), /* @__PURE__ */ React.createElement("div", { className: "flex gap-2" }, /* @__PURE__ */ React.createElement(Campo, { icon: /* @__PURE__ */ React.createElement(Phone, { size: 14 }), valor: telefono, onCambio: setTelefono, placeholder: "Teléfono (con prefijo si es extranjero, ej. +34)", tipo: "tel" }), /* @__PURE__ */ React.createElement(
         "button",
         {
           onClick: anadirPersona,
