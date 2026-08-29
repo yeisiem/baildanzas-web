@@ -542,6 +542,16 @@ function Baildanzas() {
     nuevo.avisos = nuevo.avisos.map((a) => a.id === avisoId ? { ...a, resuelto: true } : a);
     persistir(nuevo);
   };
+  const borrarAvisosResueltos = () => {
+    const nuevo = structuredClone(estado);
+    nuevo.avisos = nuevo.avisos.filter((a) => !a.resuelto);
+    persistir(nuevo);
+  };
+  const borrarAviso = (avisoId) => {
+    const nuevo = structuredClone(estado);
+    nuevo.avisos = nuevo.avisos.filter((a) => a.id !== avisoId);
+    persistir(nuevo);
+  };
   const anadirActividadBase = (dia2, hora, nombreActividad, nivel, cupo, horaFin, sala) => {
     const nuevo = structuredClone(estado);
     if (!nuevo.sedes[sedeId].activas[dia2]) nuevo.sedes[sedeId].activas[dia2] = {};
@@ -893,6 +903,8 @@ function Baildanzas() {
         setPanelDesbloqueado(false);
       },
       onResolver: resolverAviso,
+      onBorrarAvisosResueltos: borrarAvisosResueltos,
+      onBorrarAviso: borrarAviso,
       onAnadir: anadirActividadBase,
       onEditarCupo: editarCupoActividad,
       onAlternarForzarCompleto: alternarForzarCompleto,
@@ -1653,6 +1665,8 @@ function PanelGestion({
   catalogo,
   onCerrar,
   onResolver,
+  onBorrarAvisosResueltos,
+  onBorrarAviso,
   onAnadir,
   onEditarCupo,
   onAlternarForzarCompleto,
@@ -1693,6 +1707,7 @@ function PanelGestion({
   const [fechaPrueba, setFechaPrueba] = useState("");
   const [expandidaActiva, setExpandidaActiva] = useState(null);
   const [editandoClaseId, setEditandoClaseId] = useState(null);
+  const [confirmandoBorrarResueltos, setConfirmandoBorrarResueltos] = useState(false);
   const [ecNombre, setEcNombre] = useState("");
   const [ecNivel, setEcNivel] = useState("");
   const [ecDia, setEcDia] = useState("");
@@ -1832,7 +1847,43 @@ function PanelGestion({
         badge
       )
     ))),
-    tab === "avisos" && /* @__PURE__ */ React.createElement("div", { className: "space-y-3" }, pendientes.length === 0 && /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.7 }, className: "text-sm" }, "No hay avisos pendientes. Aquí verás cuándo alguien se apunta o cuándo una propuesta llega a ", UMBRAL_PROPUESTA, " personas."), pendientes.map((a) => /* @__PURE__ */ React.createElement("div", { key: a.id, style: { background: PAL.blanco, border: `1px solid ${PAL.linea}` }, className: "p-4 rounded-2xl" }, /* @__PURE__ */ React.createElement("div", { className: "flex items-start justify-between gap-2" }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { fontFamily: FONT.display }, className: "font-medium text-sm" }, a.nombre), /* @__PURE__ */ React.createElement("div", { style: { color: PAL.carmin }, className: "text-xs mt-0.5" }, a.tipo), /* @__PURE__ */ React.createElement("div", { style: { fontFamily: FONT.mono, opacity: 0.7 }, className: "text-[12px] mt-1" }, a.dia, " · ", a.hora)), /* @__PURE__ */ React.createElement("button", { onClick: () => onResolver(a.id), style: { color: PAL.petroleo }, className: "p-1.5 shrink-0" }, /* @__PURE__ */ React.createElement(Check, { size: 16 }))), /* @__PURE__ */ React.createElement("div", { className: "mt-2" }, (a.contactos || (a.contacto ? [a.contacto] : [])).map((c, i) => /* @__PURE__ */ React.createElement(FilaPersona, { key: i, nombre: c.nombre, telefono: c.telefono, ts: c.ts }))))), resueltos.length > 0 && /* @__PURE__ */ React.createElement("details", { className: "pt-2" }, /* @__PURE__ */ React.createElement("summary", { style: { color: PAL.tinta, opacity: 0.62 }, className: "text-xs cursor-pointer" }, "Resueltos (", resueltos.length, ")"), /* @__PURE__ */ React.createElement("div", { className: "mt-2 space-y-2" }, resueltos.map((a) => /* @__PURE__ */ React.createElement("div", { key: a.id, style: { opacity: 0.65 }, className: "text-xs" }, a.nombre, " — ", a.dia, " ", a.hora))))),
+    tab === "avisos" && /* @__PURE__ */ React.createElement("div", { className: "space-y-3" }, pendientes.length === 0 && /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.7 }, className: "text-sm" }, "No hay avisos pendientes. Aquí verás cuándo alguien se apunta o cuándo una propuesta llega a ", UMBRAL_PROPUESTA, " personas."), pendientes.map((a) => /* @__PURE__ */ React.createElement("div", { key: a.id, style: { background: PAL.blanco, border: `1px solid ${PAL.linea}` }, className: "p-4 rounded-2xl" }, /* @__PURE__ */ React.createElement("div", { className: "flex items-start justify-between gap-2" }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { fontFamily: FONT.display }, className: "font-medium text-sm" }, a.nombre), /* @__PURE__ */ React.createElement("div", { style: { color: PAL.carmin }, className: "text-xs mt-0.5" }, a.tipo), /* @__PURE__ */ React.createElement("div", { style: { fontFamily: FONT.mono, opacity: 0.7 }, className: "text-[12px] mt-1" }, a.dia, " · ", a.hora)), /* @__PURE__ */ React.createElement("button", { onClick: () => onResolver(a.id), style: { color: PAL.petroleo }, className: "p-1.5 shrink-0" }, /* @__PURE__ */ React.createElement(Check, { size: 16 }))), /* @__PURE__ */ React.createElement("div", { className: "mt-2" }, (a.contactos || (a.contacto ? [a.contacto] : [])).map((c, i) => /* @__PURE__ */ React.createElement(FilaPersona, { key: i, nombre: c.nombre, telefono: c.telefono, ts: c.ts }))))), resueltos.length > 0 && /* @__PURE__ */ React.createElement("details", { className: "pt-2" }, /* @__PURE__ */ React.createElement("summary", { style: { color: PAL.tinta, opacity: 0.62 }, className: "text-xs cursor-pointer" }, "Resueltos (", resueltos.length, ")"), /* @__PURE__ */ React.createElement("div", { className: "mt-2 space-y-2" }, confirmandoBorrarResueltos ? /* @__PURE__ */ React.createElement("div", { style: { background: PAL.papel, border: `1px solid ${PAL.carmin}` }, className: "rounded-lg p-2.5 flex items-center gap-2 flex-wrap" }, /* @__PURE__ */ React.createElement("span", { style: { color: PAL.tinta }, className: "text-xs" }, "¿Borrar los ", resueltos.length, " avisos resueltos? No se puede deshacer."), /* @__PURE__ */ React.createElement(
+      "button",
+      {
+        onClick: () => {
+          onBorrarAvisosResueltos();
+          setConfirmandoBorrarResueltos(false);
+        },
+        style: { background: PAL.carmin },
+        className: "px-2.5 py-1 rounded-md text-white text-xs font-medium"
+      },
+      "Sí, borrar"
+    ), /* @__PURE__ */ React.createElement(
+      "button",
+      {
+        onClick: () => setConfirmandoBorrarResueltos(false),
+        style: { borderColor: PAL.linea, color: PAL.tinta },
+        className: "px-2.5 py-1 rounded-md border text-xs"
+      },
+      "Cancelar"
+    )) : /* @__PURE__ */ React.createElement(
+      "button",
+      {
+        onClick: () => setConfirmandoBorrarResueltos(true),
+        style: { color: PAL.carmin, opacity: 0.85 },
+        className: "text-xs underline"
+      },
+      "Borrar todos los resueltos"
+    ), resueltos.map((a) => /* @__PURE__ */ React.createElement("div", { key: a.id, style: { opacity: 0.65 }, className: "text-xs flex items-center justify-between gap-2" }, /* @__PURE__ */ React.createElement("span", null, a.nombre, " — ", a.dia, " ", a.hora), /* @__PURE__ */ React.createElement(
+      "button",
+      {
+        onClick: () => onBorrarAviso(a.id),
+        style: { color: PAL.carmin, opacity: 0.85 },
+        className: "shrink-0",
+        title: "Borrar este aviso"
+      },
+      /* @__PURE__ */ React.createElement(Trash2, { size: 12 })
+    )))))),
     tab === "buscar" && /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.7 }, className: "text-xs mb-3" }, "Busca por el nombre o el teléfono que os haya dado la persona para ver en qué está apuntada (en cualquiera de las dos sedes) y darla de baja si os lo pide."), /* @__PURE__ */ React.createElement("div", { className: "flex gap-2 mb-4" }, /* @__PURE__ */ React.createElement(
       "input",
       {
