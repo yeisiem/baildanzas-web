@@ -3,7 +3,7 @@ import React2 from "react";
 import { createRoot } from "react-dom/client";
 
 // App.jsx
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import {
   MapPin,
   Users,
@@ -626,6 +626,14 @@ function Baildanzas() {
     nuevo.sedes[sedeId].activas[cambios.dia][cambios.hora].push(actualizada);
     persistir(nuevo);
   };
+  const renombrarPropuesta = (dia2, hora, propuestaId, nuevoNombre) => {
+    if (!nuevoNombre.trim()) return;
+    const nuevo = structuredClone(estado);
+    const lista = nuevo.sedes[sedeId].propuestas[dia2]?.[hora] || [];
+    const p = lista.find((x) => x.id === propuestaId);
+    if (p) p.nombre = nuevoNombre.trim();
+    persistir(nuevo);
+  };
   const aprobarSugerencia = (sugerenciaId) => {
     const nuevo = structuredClone(estado);
     const s = nuevo.sugerencias.find((x) => x.id === sugerenciaId);
@@ -910,6 +918,7 @@ function Baildanzas() {
       onAlternarForzarCompleto: alternarForzarCompleto,
       onEditarDisponibilidad: editarDisponibilidad,
       onEditarClaseFija: editarClaseFija,
+      onRenombrarPropuesta: renombrarPropuesta,
       onRenombrarSede: renombrarSede,
       onEditarDireccionSede: editarDireccionSede,
       onBorrar: borrarActividadBase,
@@ -1110,6 +1119,11 @@ function ModalComoFunciona({ onCerrar }) {
   );
 }
 function SelectorDia({ dia, diaIdx, setDiaIdx, dias }) {
+  const refsBotones = useRef([]);
+  useEffect(() => {
+    const boton = refsBotones.current[diaIdx];
+    if (boton) boton.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+  }, [diaIdx]);
   return /* @__PURE__ */ React.createElement("div", { className: "max-w-2xl mx-auto px-4 mt-5 flex items-center gap-3" }, /* @__PURE__ */ React.createElement(
     "button",
     {
@@ -1124,6 +1138,7 @@ function SelectorDia({ dia, diaIdx, setDiaIdx, dias }) {
       "button",
       {
         key: d,
+        ref: (el) => refsBotones.current[i] = el,
         onClick: () => setDiaIdx(i),
         style: {
           fontFamily: FONT.mono,
@@ -1672,6 +1687,7 @@ function PanelGestion({
   onAlternarForzarCompleto,
   onEditarDisponibilidad,
   onEditarClaseFija,
+  onRenombrarPropuesta,
   onRenombrarSede,
   onEditarDireccionSede,
   onBorrar,
@@ -1708,6 +1724,10 @@ function PanelGestion({
   const [expandidaActiva, setExpandidaActiva] = useState(null);
   const [editandoClaseId, setEditandoClaseId] = useState(null);
   const [confirmandoBorrarResueltos, setConfirmandoBorrarResueltos] = useState(false);
+  const [editandoPropuestaId, setEditandoPropuestaId] = useState(null);
+  const [epNombre, setEpNombre] = useState("");
+  const [rechazandoSugerenciaId, setRechazandoSugerenciaId] = useState(null);
+  const [motivoRechazo, setMotivoRechazo] = useState("");
   const [ecNombre, setEcNombre] = useState("");
   const [ecNivel, setEcNivel] = useState("");
   const [ecDia, setEcDia] = useState("");
@@ -2298,7 +2318,38 @@ function PanelGestion({
     ))), /* @__PURE__ */ React.createElement(EditorDisponibilidad, { sede, onEditarDisponibilidad })),
     tab === "propuestas" && /* @__PURE__ */ React.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.7 }, className: "text-xs mb-1" }, "Todas las propuestas abiertas del catálogo, con quién se ha apuntado a cada una."), listaPropuestas.length === 0 && /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.7 }, className: "text-sm" }, "No hay ninguna propuesta abierta ahora mismo."), listaPropuestas.slice().sort((a, b) => b.ultimoTs - a.ultimoTs).map((p) => {
       const duplicados = grupoDuplicado(p).filter((d) => d.id !== p.id);
-      return /* @__PURE__ */ React.createElement("div", { key: p.id, style: { background: PAL.blanco, border: `1.5px dashed ${PAL.mostaza}` }, className: "p-4 rounded-2xl" }, /* @__PURE__ */ React.createElement("div", { className: "flex items-start justify-between gap-2 mb-2" }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { fontFamily: FONT.display }, className: "font-medium text-sm" }, p.nombre), /* @__PURE__ */ React.createElement("div", { style: { fontFamily: FONT.mono, opacity: 0.7 }, className: "text-[12px] mt-1" }, p.dia, " · ", p.hora, p.sala ? ` · ${p.sala}` : "")), /* @__PURE__ */ React.createElement(DotsProgreso, { n: p.personas.length })), duplicados.length > 0 && /* @__PURE__ */ React.createElement("div", { style: { background: PAL.papel, border: `1px solid ${PAL.carmin}` }, className: "rounded-xl p-2.5 mb-3" }, /* @__PURE__ */ React.createElement("p", { style: { color: PAL.carmin }, className: "text-[13px] mb-1.5" }, "Hay ", duplicados.length + 1, ' propuestas de "', p.nombre, '" en este mismo hueco — probablemente por error.'), /* @__PURE__ */ React.createElement(
+      return /* @__PURE__ */ React.createElement("div", { key: p.id, style: { background: PAL.blanco, border: `1.5px dashed ${PAL.mostaza}` }, className: "p-4 rounded-2xl" }, /* @__PURE__ */ React.createElement("div", { className: "flex items-start justify-between gap-2 mb-2" }, /* @__PURE__ */ React.createElement("div", { className: "flex-1 min-w-0" }, editandoPropuestaId === p.id ? /* @__PURE__ */ React.createElement("div", { className: "flex items-center gap-1.5" }, /* @__PURE__ */ React.createElement(
+        "input",
+        {
+          value: epNombre,
+          onChange: (e) => setEpNombre(e.target.value),
+          className: "flex-1 px-2 py-1 rounded-lg border text-sm",
+          style: { borderColor: PAL.linea, fontFamily: FONT.display },
+          autoFocus: true
+        }
+      ), /* @__PURE__ */ React.createElement(
+        "button",
+        {
+          onClick: () => {
+            onRenombrarPropuesta(p.dia, p.hora, p.id, epNombre);
+            setEditandoPropuestaId(null);
+          },
+          style: { color: PAL.petroleo },
+          title: "Guardar"
+        },
+        /* @__PURE__ */ React.createElement(Check, { size: 16 })
+      ), /* @__PURE__ */ React.createElement("button", { onClick: () => setEditandoPropuestaId(null), style: { color: PAL.carmin }, title: "Cancelar" }, /* @__PURE__ */ React.createElement(X, { size: 16 }))) : /* @__PURE__ */ React.createElement("div", { className: "flex items-center gap-1.5" }, /* @__PURE__ */ React.createElement("div", { style: { fontFamily: FONT.display }, className: "font-medium text-sm" }, p.nombre), /* @__PURE__ */ React.createElement(
+        "button",
+        {
+          onClick: () => {
+            setEditandoPropuestaId(p.id);
+            setEpNombre(p.nombre);
+          },
+          style: { color: PAL.tinta, opacity: 0.55 },
+          title: "Editar el nombre de esta propuesta"
+        },
+        /* @__PURE__ */ React.createElement(Pencil, { size: 12 })
+      )), /* @__PURE__ */ React.createElement("div", { style: { fontFamily: FONT.mono, opacity: 0.7 }, className: "text-[12px] mt-1" }, p.dia, " · ", p.hora, p.sala ? ` · ${p.sala}` : "")), /* @__PURE__ */ React.createElement(DotsProgreso, { n: p.personas.length })), duplicados.length > 0 && /* @__PURE__ */ React.createElement("div", { style: { background: PAL.papel, border: `1px solid ${PAL.carmin}` }, className: "rounded-xl p-2.5 mb-3" }, /* @__PURE__ */ React.createElement("p", { style: { color: PAL.carmin }, className: "text-[13px] mb-1.5" }, "Hay ", duplicados.length + 1, ' propuestas de "', p.nombre, '" en este mismo hueco — probablemente por error.'), /* @__PURE__ */ React.createElement(
         "button",
         {
           onClick: () => onFusionarPropuestas(p.dia, p.hora, p.id, duplicados[0].id),
@@ -2407,10 +2458,13 @@ Gracias a tu propuesta (y a las demás personas interesadas), ya somos suficient
         "Convertir en clase activa"
       ));
     })),
-    tab === "sugerencias" && /* @__PURE__ */ React.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.7 }, className: "text-xs mb-1" }, 'Actividades "Otra" propuestas por alumnos. No aparecen en el calendario hasta que las apruebes.'), sugerenciasPendientes.length === 0 && /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.7 }, className: "text-sm" }, "No hay sugerencias pendientes."), sugerenciasPendientes.map((s) => /* @__PURE__ */ React.createElement("div", { key: s.id, style: { background: PAL.blanco, border: `1.5px dashed ${PAL.mostaza}` }, className: "p-4 rounded-2xl" }, /* @__PURE__ */ React.createElement("div", { className: "flex items-start justify-between gap-2" }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { fontFamily: FONT.display }, className: "font-medium text-sm" }, s.nombre), /* @__PURE__ */ React.createElement("div", { style: { fontFamily: FONT.mono, opacity: 0.7 }, className: "text-[12px] mt-1" }, s.dia, " · ", s.hora)), /* @__PURE__ */ React.createElement("div", { className: "flex gap-1.5 shrink-0" }, /* @__PURE__ */ React.createElement(
+    tab === "sugerencias" && /* @__PURE__ */ React.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.7 }, className: "text-xs mb-1" }, 'Actividades "Otra" propuestas por alumnos. No aparecen en el calendario hasta que las apruebes.'), sugerenciasPendientes.length === 0 && /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.7 }, className: "text-sm" }, "No hay sugerencias pendientes."), sugerenciasPendientes.map((s) => /* @__PURE__ */ React.createElement("div", { key: s.id, style: { background: PAL.blanco, border: `1.5px dashed ${PAL.mostaza}` }, className: "p-4 rounded-2xl" }, /* @__PURE__ */ React.createElement("div", { className: "flex items-start justify-between gap-2" }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { fontFamily: FONT.display }, className: "font-medium text-sm" }, s.nombre), /* @__PURE__ */ React.createElement("div", { style: { fontFamily: FONT.mono, opacity: 0.7 }, className: "text-[12px] mt-1" }, s.dia, " · ", s.hora), /* @__PURE__ */ React.createElement("div", { style: { fontFamily: FONT.mono, opacity: 0.5 }, className: "text-[11px] mt-0.5" }, "Propuesto el ", formatearFechaHora(s.ts))), /* @__PURE__ */ React.createElement("div", { className: "flex gap-1.5 shrink-0" }, /* @__PURE__ */ React.createElement(
       "button",
       {
-        onClick: () => onRechazarSugerencia(s.id),
+        onClick: () => {
+          setRechazandoSugerenciaId(s.id);
+          setMotivoRechazo("");
+        },
         style: { color: PAL.carmin, borderColor: PAL.linea },
         className: "p-1.5 border rounded-lg",
         title: "Rechazar"
@@ -2425,6 +2479,55 @@ Gracias a tu propuesta (y a las demás personas interesadas), ya somos suficient
         title: "Aprobar y publicar como propuesta"
       },
       /* @__PURE__ */ React.createElement(Check, { size: 14 })
+    ))), rechazandoSugerenciaId === s.id && /* @__PURE__ */ React.createElement("div", { style: { background: PAL.papel, border: `1px solid ${PAL.carmin}` }, className: "rounded-xl p-3 mt-3 space-y-2.5" }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("label", { style: { color: PAL.tinta, opacity: 0.7 }, className: "text-xs block mb-1" }, "Motivo (opcional) — se incluye en el mensaje de WhatsApp"), /* @__PURE__ */ React.createElement(
+      "textarea",
+      {
+        value: motivoRechazo,
+        onChange: (e) => setMotivoRechazo(e.target.value),
+        placeholder: "Ej: no tenemos instalaciones para ello",
+        rows: 2,
+        className: "w-full px-2.5 py-1.5 rounded-lg border text-sm",
+        style: { borderColor: PAL.linea }
+      }
+    )), /* @__PURE__ */ React.createElement("div", { className: "space-y-1.5" }, s.personas.map((per, i) => {
+      const mensaje = `¡Hola ${per.nombre}!
+
+Gracias por proponer *${s.nombre}* — esta vez no podemos ofrecerla${motivoRechazo.trim() ? `, ${motivoRechazo.trim()}` : ""}.
+
+¡Sigue proponiendo! Cuantas más ideas nos lleguen, mejor ajustamos el horario a lo que os apetece.
+
+Gracias por confiar en Baildanzas 💃`;
+      return /* @__PURE__ */ React.createElement("div", { key: i, className: "flex items-center justify-between gap-2" }, /* @__PURE__ */ React.createElement("span", { style: { fontFamily: FONT.mono, color: PAL.tinta, opacity: 0.75 }, className: "text-[12px]" }, per.nombre, " — ", per.telefono), /* @__PURE__ */ React.createElement(
+        "a",
+        {
+          href: enlaceWhatsApp(per.telefono, mensaje),
+          target: "_blank",
+          rel: "noopener noreferrer",
+          style: { background: "#25D366", color: "white" },
+          className: "text-[11px] px-2.5 py-1 rounded-full font-medium shrink-0 flex items-center gap-1"
+        },
+        /* @__PURE__ */ React.createElement(Phone, { size: 11 }),
+        " WhatsApp"
+      ));
+    })), /* @__PURE__ */ React.createElement("div", { className: "flex gap-2" }, /* @__PURE__ */ React.createElement(
+      "button",
+      {
+        onClick: () => {
+          onRechazarSugerencia(s.id);
+          setRechazandoSugerenciaId(null);
+        },
+        style: { background: PAL.carmin },
+        className: "flex-1 py-1.5 rounded-lg text-white text-xs font-medium"
+      },
+      "Rechazar esta sugerencia"
+    ), /* @__PURE__ */ React.createElement(
+      "button",
+      {
+        onClick: () => setRechazandoSugerenciaId(null),
+        style: { borderColor: PAL.linea, color: PAL.tinta },
+        className: "flex-1 py-1.5 rounded-lg border text-xs font-medium"
+      },
+      "Cancelar"
     ))), /* @__PURE__ */ React.createElement("div", { className: "mt-2" }, s.personas.map((c, i) => /* @__PURE__ */ React.createElement(FilaPersona, { key: i, nombre: c.nombre, telefono: c.telefono, ts: c.ts })))))),
     tab === "catalogo" && /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.7 }, className: "text-xs mb-3" }, "Estas son las actividades que la gente puede elegir al proponer algo en un hueco libre."), /* @__PURE__ */ React.createElement("div", { className: "flex gap-2 mb-4" }, /* @__PURE__ */ React.createElement(
       "input",
