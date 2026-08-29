@@ -241,9 +241,16 @@ var DISPONIBILIDAD_SEDE2 = {
 };
 var estadoInicial = () => ({
   sedes: {
-    1: { nombre: "Baildanzas Calle de los Narcisos, 14", activas: semillaHorario(), propuestas: {}, disponibilidad: DISPONIBILIDAD_SEDE1 },
+    1: {
+      nombre: "Baildanzas",
+      direccion: "Calle de los Narcisos, 14",
+      activas: semillaHorario(),
+      propuestas: {},
+      disponibilidad: DISPONIBILIDAD_SEDE1
+    },
     2: {
-      nombre: "Calle de Víctor de la Serna, 37",
+      nombre: "Baildanzas",
+      direccion: "Calle de Víctor de la Serna, 37",
       activas: {},
       propuestas: {},
       salas: ["Sala 1", "Sala 2"],
@@ -328,6 +335,18 @@ function Baildanzas() {
       }
       if (base.sedes[1] && !base.sedes[1].disponibilidad) {
         base.sedes[1].disponibilidad = DISPONIBILIDAD_SEDE1;
+      }
+      if (base.sedes[1] && !base.sedes[1].direccion) {
+        if (base.sedes[1].nombre === "Baildanzas I" || base.sedes[1].nombre === "Baildanzas Calle de los Narcisos, 14") {
+          base.sedes[1].nombre = "Baildanzas";
+        }
+        base.sedes[1].direccion = "Calle de los Narcisos, 14";
+      }
+      if (base.sedes[2] && !base.sedes[2].direccion) {
+        if (base.sedes[2].nombre === "Baildanzas II" || base.sedes[2].nombre === "Calle de Víctor de la Serna, 37") {
+          base.sedes[2].nombre = "Baildanzas";
+        }
+        base.sedes[2].direccion = "Calle de Víctor de la Serna, 37";
       }
       setEstado(base);
       setCargando(false);
@@ -565,6 +584,11 @@ function Baildanzas() {
     if (!nuevoNombre.trim()) return;
     const nuevo = structuredClone(estado);
     nuevo.sedes[sedeId].nombre = nuevoNombre.trim();
+    persistir(nuevo);
+  };
+  const editarDireccionSede = (nuevaDireccion) => {
+    const nuevo = structuredClone(estado);
+    nuevo.sedes[sedeId].direccion = nuevaDireccion.trim();
     persistir(nuevo);
   };
   const borrarActividadBase = (dia2, hora, activityId) => {
@@ -875,6 +899,7 @@ function Baildanzas() {
       onEditarDisponibilidad: editarDisponibilidad,
       onEditarClaseFija: editarClaseFija,
       onRenombrarSede: renombrarSede,
+      onEditarDireccionSede: editarDireccionSede,
       onBorrar: borrarActividadBase,
       onAprobarSugerencia: aprobarSugerencia,
       onRechazarSugerencia: rechazarSugerencia,
@@ -982,7 +1007,7 @@ function Cabecera({ sedeId, setSedeId, sedes, avisos, onGestion }) {
       },
       avisos
     )
-  )), /* @__PURE__ */ React.createElement("div", { className: "flex gap-2 mt-6" }, Object.entries(sedes).map(([id, s]) => {
+  )), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 8, flexWrap: "wrap" }, className: "mt-6" }, Object.entries(sedes).map(([id, s]) => {
     const activo = Number(id) === sedeId;
     return /* @__PURE__ */ React.createElement(
       "button",
@@ -993,12 +1018,15 @@ function Cabecera({ sedeId, setSedeId, sedes, avisos, onGestion }) {
           fontFamily: FONT.mono,
           background: activo ? PAL.petroleo : "transparent",
           color: activo ? PAL.papel : PAL.petroleo,
-          border: `1px solid ${PAL.petroleo}`
+          border: `1px solid ${PAL.petroleo}`,
+          display: "flex",
+          alignItems: "center",
+          gap: 6
         },
-        className: "px-4 py-2 text-xs uppercase tracking-widest rounded-full transition-colors flex items-center gap-1.5"
+        className: "px-4 py-2 text-xs uppercase tracking-widest rounded-full transition-colors"
       },
       /* @__PURE__ */ React.createElement(MapPin, { size: 12 }),
-      s.nombre
+      /* @__PURE__ */ React.createElement("span", { style: { display: "flex", flexDirection: "column", alignItems: "flex-start", lineHeight: 1.2 } }, /* @__PURE__ */ React.createElement("span", null, s.nombre), s.direccion && /* @__PURE__ */ React.createElement("span", { style: { opacity: 0.7, fontSize: "10px", textTransform: "none", letterSpacing: "0.02em" } }, s.direccion))
     );
   }))), mostrarComoFunciona && /* @__PURE__ */ React.createElement(ModalComoFunciona, { onCerrar: () => setMostrarComoFunciona(false) }));
 }
@@ -1631,6 +1659,7 @@ function PanelGestion({
   onEditarDisponibilidad,
   onEditarClaseFija,
   onRenombrarSede,
+  onEditarDireccionSede,
   onBorrar,
   onAprobarSugerencia,
   onRechazarSugerencia,
@@ -1737,7 +1766,7 @@ function PanelGestion({
       },
       /* @__PURE__ */ React.createElement(Download, { size: 19 })
     ), /* @__PURE__ */ React.createElement("button", { onClick: onCerrar, style: { color: PAL.tinta, opacity: 0.7 } }, /* @__PURE__ */ React.createElement(X, { size: 20 })))),
-    /* @__PURE__ */ React.createElement("div", { className: "flex gap-2 mb-5 flex-wrap" }, Object.entries(sedes).map(([id, s]) => {
+    /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 8, flexWrap: "wrap" }, className: "mb-5" }, Object.entries(sedes).map(([id, s]) => {
       const activo = Number(id) === sedeId;
       return /* @__PURE__ */ React.createElement(
         "button",
@@ -1748,12 +1777,15 @@ function PanelGestion({
             fontFamily: FONT.mono,
             background: activo ? PAL.petroleo : "transparent",
             color: activo ? PAL.papel : PAL.petroleo,
-            border: `1px solid ${PAL.petroleo}`
+            border: `1px solid ${PAL.petroleo}`,
+            display: "flex",
+            alignItems: "center",
+            gap: 6
           },
-          className: "px-3.5 py-1.5 text-[13px] uppercase tracking-widest rounded-full flex items-center gap-1.5"
+          className: "px-3.5 py-1.5 text-[13px] uppercase tracking-widest rounded-full"
         },
         /* @__PURE__ */ React.createElement(MapPin, { size: 12 }),
-        s.nombre
+        /* @__PURE__ */ React.createElement("span", { style: { display: "flex", flexDirection: "column", alignItems: "flex-start", lineHeight: 1.2 } }, /* @__PURE__ */ React.createElement("span", null, s.nombre), s.direccion && /* @__PURE__ */ React.createElement("span", { style: { opacity: 0.7, fontSize: "10px", textTransform: "none", letterSpacing: "0.02em" } }, s.direccion))
       );
     })),
     /* @__PURE__ */ React.createElement("div", { className: "flex gap-2 mb-5 flex-wrap" }, [
@@ -2193,13 +2225,23 @@ function PanelGestion({
         })
       ));
     }))),
-    tab === "disponibilidad" && /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { border: `1px solid ${PAL.linea}` }, className: "rounded-xl p-3 mb-4" }, /* @__PURE__ */ React.createElement("label", { style: { color: PAL.tinta, opacity: 0.7 }, className: "text-xs block mb-1.5" }, "Nombre de esta sede (se ve en el selector y en todo el calendario público)"), /* @__PURE__ */ React.createElement("div", { className: "flex gap-2" }, /* @__PURE__ */ React.createElement(
+    tab === "disponibilidad" && /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { border: `1px solid ${PAL.linea}` }, className: "rounded-xl p-3 mb-4 space-y-3" }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("label", { style: { color: PAL.tinta, opacity: 0.7 }, className: "text-xs block mb-1.5" }, "Nombre de esta sede (se ve en el selector y en todo el calendario público)"), /* @__PURE__ */ React.createElement(
       "input",
       {
-        key: sede.nombre,
+        key: "nombre-" + sede.nombre,
         defaultValue: sede.nombre,
         onBlur: (e) => onRenombrarSede(e.target.value),
-        className: "flex-1 px-2.5 py-1.5 rounded-lg border text-sm",
+        className: "w-full px-2.5 py-1.5 rounded-lg border text-sm",
+        style: { borderColor: PAL.linea }
+      }
+    )), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("label", { style: { color: PAL.tinta, opacity: 0.7 }, className: "text-xs block mb-1.5" }, "Dirección (se muestra debajo del nombre, más pequeña)"), /* @__PURE__ */ React.createElement(
+      "input",
+      {
+        key: "direccion-" + sede.direccion,
+        defaultValue: sede.direccion || "",
+        onBlur: (e) => onEditarDireccionSede(e.target.value),
+        placeholder: "Ej: Calle de los Narcisos, 14",
+        className: "w-full px-2.5 py-1.5 rounded-lg border text-sm",
         style: { borderColor: PAL.linea }
       }
     ))), /* @__PURE__ */ React.createElement(EditorDisponibilidad, { sede, onEditarDisponibilidad })),
