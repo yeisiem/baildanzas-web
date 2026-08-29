@@ -1026,7 +1026,7 @@ function Cabecera({ sedeId, setSedeId, sedes, avisos, onGestion }) {
         className: "px-4 py-2 text-xs uppercase tracking-widest rounded-full transition-colors"
       },
       /* @__PURE__ */ React.createElement(MapPin, { size: 12 }),
-      /* @__PURE__ */ React.createElement("span", { style: { display: "flex", flexDirection: "column", alignItems: "flex-start", lineHeight: 1.2 } }, /* @__PURE__ */ React.createElement("span", null, s.nombre), s.direccion && /* @__PURE__ */ React.createElement("span", { style: { opacity: 0.7, fontSize: "10px", textTransform: "none", letterSpacing: "0.02em" } }, s.direccion))
+      /* @__PURE__ */ React.createElement("span", { style: { display: "flex", flexDirection: "column", alignItems: "flex-start", lineHeight: 1.2 } }, /* @__PURE__ */ React.createElement("span", null, s.nombre), s.direccion && /* @__PURE__ */ React.createElement("span", { style: { opacity: 0.85, fontSize: "13px", textTransform: "none", letterSpacing: "0.01em", fontWeight: 500 } }, s.direccion))
     );
   }))), mostrarComoFunciona && /* @__PURE__ */ React.createElement(ModalComoFunciona, { onCerrar: () => setMostrarComoFunciona(false) }));
 }
@@ -1785,7 +1785,7 @@ function PanelGestion({
           className: "px-3.5 py-1.5 text-[13px] uppercase tracking-widest rounded-full"
         },
         /* @__PURE__ */ React.createElement(MapPin, { size: 12 }),
-        /* @__PURE__ */ React.createElement("span", { style: { display: "flex", flexDirection: "column", alignItems: "flex-start", lineHeight: 1.2 } }, /* @__PURE__ */ React.createElement("span", null, s.nombre), s.direccion && /* @__PURE__ */ React.createElement("span", { style: { opacity: 0.7, fontSize: "10px", textTransform: "none", letterSpacing: "0.02em" } }, s.direccion))
+        /* @__PURE__ */ React.createElement("span", { style: { display: "flex", flexDirection: "column", alignItems: "flex-start", lineHeight: 1.2 } }, /* @__PURE__ */ React.createElement("span", null, s.nombre), s.direccion && /* @__PURE__ */ React.createElement("span", { style: { opacity: 0.85, fontSize: "13px", textTransform: "none", letterSpacing: "0.01em", fontWeight: 500 } }, s.direccion))
       );
     })),
     /* @__PURE__ */ React.createElement("div", { className: "flex gap-2 mb-5 flex-wrap" }, [
