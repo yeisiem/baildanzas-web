@@ -933,6 +933,7 @@ function Baildanzas() {
       onConvertirEnActiva: convertirEnClaseActiva,
       onAnadirAlumno: anadirAlumnoActiva,
       interesados: estado.interesados,
+      listaEspera: estado.listaEspera,
       vistoPropuestasTs: estado.vistoPropuestas[sedeId] || 0,
       onMarcarPropuestasVistas: marcarPropuestasVistas,
       onExportar: exportarCopiaSeguridad
@@ -1704,6 +1705,7 @@ function PanelGestion({
   vistoPropuestasTs,
   onMarcarPropuestasVistas,
   interesados,
+  listaEspera,
   onExportar
 }) {
   const [tab, setTab] = useState("avisos");
@@ -2273,7 +2275,24 @@ Gracias por confiar en nosotros, ¡nos vemos pronto! 💃`;
               tituloQuitar: "Quitar de esta clase",
               onGuardarEdicion: (n, t) => onEditarInteresado(act.id, idx, "interesados", n, t)
             }
-          ))) : /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.62 }, className: "text-xs mb-2" }, "Todavía no hay alumnado apuntado en esta clase."), /* @__PURE__ */ React.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React.createElement(
+          ))) : /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.62 }, className: "text-xs mb-2" }, "Todavía no hay alumnado apuntado en esta clase."), (listaEspera[act.id] || []).length > 0 && /* @__PURE__ */ React.createElement("div", { className: "mb-2" }, /* @__PURE__ */ React.createElement("p", { style: { color: PAL.carmin, opacity: 0.85 }, className: "text-xs font-medium mb-1.5" }, "Lista de espera (", listaEspera[act.id].length, ")"), /* @__PURE__ */ React.createElement("div", { style: { background: PAL.blanco, border: `1px solid ${PAL.carmin}` }, className: "rounded-lg px-2" }, listaEspera[act.id].map((per, idx) => /* @__PURE__ */ React.createElement("div", { key: idx, className: "flex items-center gap-1.5" }, /* @__PURE__ */ React.createElement(
+            "span",
+            {
+              style: { background: PAL.carmin, color: PAL.blanco, fontFamily: FONT.mono },
+              className: "text-[11px] w-5 h-5 rounded-full flex items-center justify-center shrink-0"
+            },
+            idx + 1
+          ), /* @__PURE__ */ React.createElement("div", { className: "flex-1 min-w-0" }, /* @__PURE__ */ React.createElement(
+            FilaPersona,
+            {
+              nombre: per.nombre,
+              telefono: per.telefono,
+              ts: per.ts,
+              onQuitar: () => onQuitarInteresado(act.id, idx, "espera"),
+              tituloQuitar: "Quitar de la lista de espera",
+              onGuardarEdicion: (n, t) => onEditarInteresado(act.id, idx, "espera", n, t)
+            }
+          )))))), /* @__PURE__ */ React.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React.createElement(
             "input",
             {
               value: nuevoAlumnoNombre,
