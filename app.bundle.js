@@ -576,6 +576,17 @@ function Baildanzas() {
     if (act) act.cupo = nuevoCupo || void 0;
     persistir(nuevo);
   };
+  const promocionarDeEspera = (dia2, hora, activityId, idxPersona) => {
+    const nuevo = structuredClone(estado);
+    const lista = nuevo.listaEspera[activityId] || [];
+    const persona = lista[idxPersona];
+    if (!persona) return;
+    lista.splice(idxPersona, 1);
+    if (!nuevo.interesados[activityId]) nuevo.interesados[activityId] = [];
+    nuevo.interesados[activityId].push({ ...persona, ts: Date.now() });
+    persistir(nuevo);
+    mostrarToast(`${persona.nombre} ha pasado de la lista de espera a la clase.`);
+  };
   const alternarForzarCompleto = (dia2, hora, activityId) => {
     const nuevo = structuredClone(estado);
     const lista = nuevo.sedes[sedeId].activas[dia2]?.[hora] || [];
@@ -918,6 +929,7 @@ function Baildanzas() {
       onAlternarForzarCompleto: alternarForzarCompleto,
       onEditarDisponibilidad: editarDisponibilidad,
       onEditarClaseFija: editarClaseFija,
+      onPromocionarDeEspera: promocionarDeEspera,
       onRenombrarPropuesta: renombrarPropuesta,
       onRenombrarSede: renombrarSede,
       onEditarDireccionSede: editarDireccionSede,
@@ -1688,6 +1700,7 @@ function PanelGestion({
   onAlternarForzarCompleto,
   onEditarDisponibilidad,
   onEditarClaseFija,
+  onPromocionarDeEspera,
   onRenombrarPropuesta,
   onRenombrarSede,
   onEditarDireccionSede,
@@ -2292,7 +2305,16 @@ Gracias por confiar en nosotros, ¡nos vemos pronto! 💃`;
               tituloQuitar: "Quitar de la lista de espera",
               onGuardarEdicion: (n, t) => onEditarInteresado(act.id, idx, "espera", n, t)
             }
-          )))))), /* @__PURE__ */ React.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React.createElement(
+          )), /* @__PURE__ */ React.createElement(
+            "button",
+            {
+              onClick: () => onPromocionarDeEspera(d, h, act.id, idx),
+              style: { background: PAL.petroleo, color: PAL.blanco },
+              className: "text-[11px] px-2 py-1.5 rounded-lg font-medium shrink-0",
+              title: "Pasar a esta persona de la lista de espera a la clase"
+            },
+            "Pasar a la clase"
+          ))))), /* @__PURE__ */ React.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React.createElement(
             "input",
             {
               value: nuevoAlumnoNombre,
