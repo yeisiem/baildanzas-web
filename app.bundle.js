@@ -319,6 +319,7 @@ function Baildanzas() {
   const [panelGestion, setPanelGestion] = useState(false);
   const [panelDesbloqueado, setPanelDesbloqueado] = useState(false);
   const [toast, setToast] = useState(null);
+  const [snapshotDeshacer, setSnapshotDeshacer] = useState(null);
   const [errorCarga, setErrorCarga] = useState(false);
   useEffect(() => {
     (async () => {
@@ -361,9 +362,20 @@ function Baildanzas() {
       }
     });
   }, []);
-  const mostrarToast = (msg) => {
+  const mostrarToast = (msg, snapshotParaDeshacer = null) => {
     setToast(msg);
-    setTimeout(() => setToast(null), 9600);
+    setSnapshotDeshacer(snapshotParaDeshacer);
+    setTimeout(() => {
+      setToast(null);
+      setSnapshotDeshacer(null);
+    }, 9600);
+  };
+  const deshacer = () => {
+    if (!snapshotDeshacer) return;
+    persistir(snapshotDeshacer);
+    setSnapshotDeshacer(null);
+    setToast("Cambio deshecho.");
+    setTimeout(() => setToast(null), 4e3);
   };
   if (cargando || !estado) {
     return /* @__PURE__ */ React.createElement("div", { style: { background: PAL.papel }, className: "min-h-screen flex items-center justify-center" }, /* @__PURE__ */ React.createElement("div", { style: { fontFamily: FONT.display, color: PAL.tinta }, className: "text-2xl italic animate-pulse" }, "Preparando el compás…"), /* @__PURE__ */ React.createElement(FontImport, null));
@@ -613,11 +625,13 @@ function Baildanzas() {
     persistir(nuevo);
   };
   const borrarActividadBase = (dia2, hora, activityId) => {
+    const snapshotAntes = estado;
     const nuevo = structuredClone(estado);
     nuevo.sedes[sedeId].activas[dia2][hora] = nuevo.sedes[sedeId].activas[dia2][hora].filter(
       (a) => a.id !== activityId
     );
     persistir(nuevo);
+    mostrarToast("Clase eliminada del horario.", snapshotAntes);
   };
   const editarClaseFija = (diaViejo, horaVieja, activityId, cambios) => {
     const nuevo = structuredClone(estado);
@@ -735,12 +749,13 @@ function Baildanzas() {
     return resultados;
   };
   const quitarInteresado = (activityId, idxPersona, origen = "interesados") => {
+    const snapshotAntes = estado;
     const nuevo = structuredClone(estado);
     if (origen === "espera") {
       if (!nuevo.listaEspera[activityId]) return;
       nuevo.listaEspera[activityId].splice(idxPersona, 1);
       persistir(nuevo);
-      mostrarToast("Baja de la lista de espera correcta.");
+      mostrarToast("Baja de la lista de espera correcta.", snapshotAntes);
       return;
     }
     if (!nuevo.interesados[activityId]) return;
@@ -772,7 +787,8 @@ function Baildanzas() {
     }
     persistir(nuevo);
     mostrarToast(
-      promocionado ? `Baja hecha. ${promocionado.nombre} pasa de la lista de espera a apuntado/a — avísale.` : "Inscripción dada de baja correctamente."
+      promocionado ? `Baja hecha. ${promocionado.nombre} pasa de la lista de espera a apuntado/a — avísale.` : "Inscripción dada de baja correctamente.",
+      snapshotAntes
     );
   };
   const exportarCopiaSeguridad = () => {
@@ -950,7 +966,7 @@ function Baildanzas() {
       onMarcarPropuestasVistas: marcarPropuestasVistas,
       onExportar: exportarCopiaSeguridad
     }
-  ), toast && /* @__PURE__ */ React.createElement(Toast, { mensaje: toast }), errorCarga && /* @__PURE__ */ React.createElement(
+  ), toast && /* @__PURE__ */ React.createElement(Toast, { mensaje: toast, onDeshacer: snapshotDeshacer ? deshacer : null }), errorCarga && /* @__PURE__ */ React.createElement(
     BannerError,
     {
       mensaje: "No se pudieron cargar los últimos cambios guardados. Puede que veas información desactualizada.",
@@ -2764,14 +2780,23 @@ function FilaPersona({ nombre, telefono, ts, onQuitar, tituloQuitar, onGuardarEd
     /* @__PURE__ */ React.createElement("div", { className: "flex items-center gap-0.5 shrink-0" }, onGuardarEdicion && /* @__PURE__ */ React.createElement("button", { onClick: () => setEditando(true), style: { color: PAL.morado, opacity: 0.8 }, className: "p-1.5", title: "Corregir nombre o teléfono" }, /* @__PURE__ */ React.createElement(Pencil, { size: 13 })), onQuitar && /* @__PURE__ */ React.createElement("button", { onClick: onQuitar, style: { color: PAL.carmin, opacity: 0.73 }, className: "p-1.5", title: tituloQuitar }, /* @__PURE__ */ React.createElement(Trash2, { size: 14 })))
   );
 }
-function Toast({ mensaje }) {
+function Toast({ mensaje, onDeshacer }) {
   return /* @__PURE__ */ React.createElement(
     "div",
     {
       style: { background: PAL.tinta, color: PAL.papel, fontFamily: FONT.body },
-      className: "fixed bottom-6 left-1/2 -translate-x-1/2 px-5 py-3 rounded-full text-sm shadow-xl z-50 max-w-[90vw] text-center"
+      className: "fixed bottom-6 left-1/2 -translate-x-1/2 px-5 py-3 rounded-full text-sm shadow-xl z-50 max-w-[90vw] flex items-center gap-3"
     },
-    mensaje
+    /* @__PURE__ */ React.createElement("span", null, mensaje),
+    onDeshacer && /* @__PURE__ */ React.createElement(
+      "button",
+      {
+        onClick: onDeshacer,
+        style: { color: PAL.papel, textDecoration: "underline", fontWeight: 600 },
+        className: "shrink-0"
+      },
+      "Deshacer"
+    )
   );
 }
 function BannerError({ mensaje, onRecargar, onCerrar }) {
