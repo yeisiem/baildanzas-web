@@ -38,7 +38,6 @@ var HORAS = Array.from({ length: 13 }, (_, i) => {
   return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
 });
 var UMBRAL_PROPUESTA = 8;
-var PIN_PANEL_GESTION = "2026";
 function localizarActividad(estado, activityId) {
   for (const [sedeId, sede] of Object.entries(estado.sedes)) {
     for (const [dia, porHora] of Object.entries(sede.activas || {})) {
@@ -3008,14 +3007,45 @@ function BannerError({ mensaje, onRecargar, onCerrar }) {
 function CandadoPIN({ onCerrar, onDesbloquear }) {
   const [pin, setPin] = useState("");
   const [error, setError] = useState(false);
-  const comprobar = () => {
-    if (pin === PIN_PANEL_GESTION) {
-      onDesbloquear();
-    } else {
+  const [comprobando, setComprobando] = useState(false);
+  const [fallos, setFallos] = useState(0);
+  const [bloqueadoHasta, setBloqueadoHasta] = useState(null);
+  const segundosEspera = bloqueadoHasta ? Math.max(0, Math.ceil((bloqueadoHasta - Date.now()) / 1e3)) : 0;
+  const comprobar = async () => {
+    if (!pin || comprobando || segundosEspera > 0) return;
+    setComprobando(true);
+    try {
+      const res = await fetch("/api/verificar-codigo", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ codigo: pin })
+      });
+      const datos = await res.json();
+      if (datos.ok) {
+        onDesbloquear();
+        return;
+      }
+      const nuevosFallos = fallos + 1;
+      setFallos(nuevosFallos);
       setError(true);
       setPin("");
+      if (nuevosFallos >= 3) {
+        setBloqueadoHasta(Date.now() + 2e4);
+        setFallos(0);
+      }
+    } catch (e) {
+      setError(true);
+    } finally {
+      setComprobando(false);
     }
   };
+  useEffect(() => {
+    if (!bloqueadoHasta) return;
+    const intervalo = setInterval(() => {
+      if (Date.now() >= bloqueadoHasta) setBloqueadoHasta(null);
+    }, 500);
+    return () => clearInterval(intervalo);
+  }, [bloqueadoHasta]);
   return /* @__PURE__ */ React.createElement(
     "div",
     {
@@ -3041,33 +3071,35 @@ function CandadoPIN({ onCerrar, onDesbloquear }) {
       ),
       /* @__PURE__ */ React.createElement("div", { style: { color: PAL.morado }, className: "flex justify-center mb-3" }, /* @__PURE__ */ React.createElement(Settings, { size: 28 })),
       /* @__PURE__ */ React.createElement("h2", { style: { fontFamily: FONT.display, color: PAL.tinta }, className: "text-xl font-medium text-center mb-1" }, "Acceso del equipo"),
-      /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.76 }, className: "text-sm text-center mb-5" }, "Introduce el PIN para entrar al panel de gestión."),
+      /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.76 }, className: "text-sm text-center mb-5" }, "Introduce el código de acceso para entrar al panel de gestión."),
       /* @__PURE__ */ React.createElement(
         "input",
         {
           value: pin,
           onChange: (e) => {
-            setPin(e.target.value.replace(/\D/g, ""));
+            setPin(e.target.value);
             setError(false);
           },
           onKeyDown: (e) => e.key === "Enter" && comprobar(),
           type: "password",
-          inputMode: "numeric",
           autoFocus: true,
-          placeholder: "PIN",
+          disabled: segundosEspera > 0,
+          placeholder: "Código de acceso",
           style: { borderColor: error ? PAL.carmin : PAL.linea, background: PAL.blanco, color: PAL.tinta },
-          className: "w-full px-4 py-3 rounded-xl border text-center text-lg tracking-[0.3em] outline-none mb-2"
+          className: "w-full px-4 py-3 rounded-xl border text-center text-lg tracking-[0.15em] outline-none mb-2"
         }
       ),
-      error && /* @__PURE__ */ React.createElement("p", { style: { color: PAL.carmin }, className: "text-xs text-center mb-2" }, "PIN incorrecto, inténtalo de nuevo."),
+      error && segundosEspera === 0 && /* @__PURE__ */ React.createElement("p", { style: { color: PAL.carmin }, className: "text-xs text-center mb-2" }, "Código incorrecto, inténtalo de nuevo."),
+      segundosEspera > 0 && /* @__PURE__ */ React.createElement("p", { style: { color: PAL.carmin }, className: "text-xs text-center mb-2" }, "Demasiados intentos. Espera ", segundosEspera, "s antes de volver a intentarlo."),
       /* @__PURE__ */ React.createElement(
         "button",
         {
           onClick: comprobar,
-          style: { background: PAL.morado },
+          disabled: comprobando || segundosEspera > 0,
+          style: { background: PAL.morado, opacity: comprobando || segundosEspera > 0 ? 0.6 : 1 },
           className: "w-full mt-3 py-3 rounded-xl text-white font-medium text-sm"
         },
-        "Entrar"
+        comprobando ? "Comprobando…" : "Entrar"
       )
     )
   );
