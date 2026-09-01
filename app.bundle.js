@@ -275,39 +275,76 @@ var SUPABASE_URL = "https://gaubtsrveezvupuytijz.supabase.co";
 var SUPABASE_KEY = "sb_publishable_n0jcPvKzJvzxjKAAG9R4Tw_IF_B6s6s";
 async function cargarEstado() {
   try {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/estado_app?id=eq.1&select=datos`, {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/estado_app?id=eq.1&select=datos,actualizado_en`, {
       headers: { apikey: SUPABASE_KEY }
     });
-    if (!res.ok) return { datos: null, error: true };
+    if (!res.ok) return { datos: null, version: null, error: true };
     const filas = await res.json();
     if (filas && filas[0] && filas[0].datos && Object.keys(filas[0].datos).length > 0) {
-      return { datos: filas[0].datos, error: false };
+      return { datos: filas[0].datos, version: filas[0].actualizado_en, error: false };
     }
-    return { datos: null, error: false };
+    return { datos: null, version: filas?.[0]?.actualizado_en ?? null, error: false };
   } catch (e) {
     console.error("No se pudo leer el estado", e);
-    return { datos: null, error: true };
+    return { datos: null, version: null, error: true };
   }
 }
-async function guardarEstado(estado) {
+async function guardarEstado(estado, versionEsperada) {
   try {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/estado_app?id=eq.1`, {
+    const nuevaVersion = (/* @__PURE__ */ new Date()).toISOString();
+    let url = `${SUPABASE_URL}/rest/v1/estado_app?id=eq.1`;
+    if (versionEsperada) {
+      url += `&actualizado_en=eq.${encodeURIComponent(versionEsperada)}`;
+    }
+    const res = await fetch(url, {
       method: "PATCH",
       headers: {
         apikey: SUPABASE_KEY,
         "Content-Type": "application/json",
-        Prefer: "return=minimal"
+        Prefer: "return=representation"
       },
-      body: JSON.stringify({ datos: estado, actualizado_en: (/* @__PURE__ */ new Date()).toISOString() })
+      body: JSON.stringify({ datos: estado, actualizado_en: nuevaVersion })
     });
-    return res.ok;
+    if (!res.ok) return { ok: false, conflicto: false, version: null };
+    const filas = await res.json();
+    if (!filas || filas.length === 0) {
+      return { ok: false, conflicto: true, version: null };
+    }
+    return { ok: true, conflicto: false, version: nuevaVersion };
   } catch (e) {
     console.error("No se pudo guardar", e);
-    return false;
+    return { ok: false, conflicto: false, version: null };
   }
 }
 function contarInteresados(estado, activityId) {
   return (estado.interesados[activityId] || []).length;
+}
+function normalizarEstado(base) {
+  if (!base.catalogoActividades) base.catalogoActividades = CATALOGO_INICIAL;
+  if (!base.sugerencias) base.sugerencias = [];
+  if (!base.listaEspera) base.listaEspera = {};
+  if (!base.vistoPropuestas) base.vistoPropuestas = {};
+  if (!base.historialConversiones) base.historialConversiones = [];
+  if (base.sedes[2] && !base.sedes[2].salas) {
+    base.sedes[2].salas = ["Sala 1", "Sala 2"];
+    base.sedes[2].disponibilidad = DISPONIBILIDAD_SEDE2;
+  }
+  if (base.sedes[1] && !base.sedes[1].disponibilidad) {
+    base.sedes[1].disponibilidad = DISPONIBILIDAD_SEDE1;
+  }
+  if (base.sedes[1] && !base.sedes[1].direccion) {
+    if (base.sedes[1].nombre === "Baildanzas I" || base.sedes[1].nombre === "Baildanzas Calle de los Narcisos, 14") {
+      base.sedes[1].nombre = "Baildanzas";
+    }
+    base.sedes[1].direccion = "Calle de los Narcisos, 14";
+  }
+  if (base.sedes[2] && !base.sedes[2].direccion) {
+    if (base.sedes[2].nombre === "Baildanzas II" || base.sedes[2].nombre === "Calle de Víctor de la Serna, 37") {
+      base.sedes[2].nombre = "Baildanzas";
+    }
+    base.sedes[2].direccion = "Calle de Víctor de la Serna, 37";
+  }
+  return base;
 }
 function Baildanzas() {
   const [estado, setEstado] = useState(null);
@@ -321,46 +358,59 @@ function Baildanzas() {
   const [toast, setToast] = useState(null);
   const [snapshotDeshacer, setSnapshotDeshacer] = useState(null);
   const [errorCarga, setErrorCarga] = useState(false);
+  const escribiendoRef = useRef(false);
+  const estadoRef = useRef(null);
+  const versionRef = useRef(null);
+  estadoRef.current = estado;
   useEffect(() => {
     (async () => {
       const resultado = await cargarEstado();
-      const base = resultado.datos || estadoInicial();
-      if (!base.catalogoActividades) base.catalogoActividades = CATALOGO_INICIAL;
-      if (!base.sugerencias) base.sugerencias = [];
-      if (!base.listaEspera) base.listaEspera = {};
-      if (!base.vistoPropuestas) base.vistoPropuestas = {};
-      if (!base.historialConversiones) base.historialConversiones = [];
-      if (base.sedes[2] && !base.sedes[2].salas) {
-        base.sedes[2].salas = ["Sala 1", "Sala 2"];
-        base.sedes[2].disponibilidad = DISPONIBILIDAD_SEDE2;
-      }
-      if (base.sedes[1] && !base.sedes[1].disponibilidad) {
-        base.sedes[1].disponibilidad = DISPONIBILIDAD_SEDE1;
-      }
-      if (base.sedes[1] && !base.sedes[1].direccion) {
-        if (base.sedes[1].nombre === "Baildanzas I" || base.sedes[1].nombre === "Baildanzas Calle de los Narcisos, 14") {
-          base.sedes[1].nombre = "Baildanzas";
-        }
-        base.sedes[1].direccion = "Calle de los Narcisos, 14";
-      }
-      if (base.sedes[2] && !base.sedes[2].direccion) {
-        if (base.sedes[2].nombre === "Baildanzas II" || base.sedes[2].nombre === "Calle de Víctor de la Serna, 37") {
-          base.sedes[2].nombre = "Baildanzas";
-        }
-        base.sedes[2].direccion = "Calle de Víctor de la Serna, 37";
-      }
+      const base = normalizarEstado(resultado.datos || estadoInicial());
       setEstado(base);
+      versionRef.current = resultado.version;
       setCargando(false);
       if (resultado.error) setErrorCarga(true);
     })();
   }, []);
-  const persistir = useCallback((nuevo) => {
-    setEstado(nuevo);
-    guardarEstado(nuevo).then((ok) => {
-      if (!ok) {
-        mostrarToast("⚠️ No se pudo guardar. Comprueba tu conexión e inténtalo de nuevo.");
+  useEffect(() => {
+    if (cargando) return;
+    const intervalo = setInterval(async () => {
+      if (escribiendoRef.current) return;
+      const resultado = await cargarEstado();
+      if (resultado.error || !resultado.datos) return;
+      if (escribiendoRef.current) return;
+      versionRef.current = resultado.version;
+      const actual = JSON.stringify(estadoRef.current);
+      const recibido = JSON.stringify(normalizarEstado(resultado.datos));
+      if (actual !== recibido) {
+        setEstado(JSON.parse(recibido));
       }
-    });
+    }, 6e3);
+    return () => clearInterval(intervalo);
+  }, [cargando]);
+  const persistir = useCallback((nuevo) => {
+    escribiendoRef.current = true;
+    (async () => {
+      const resultado = await guardarEstado(nuevo, versionRef.current);
+      if (resultado.conflicto) {
+        const fresco = await cargarEstado();
+        if (!fresco.error && fresco.datos) {
+          setEstado(normalizarEstado(fresco.datos));
+          versionRef.current = fresco.version;
+        }
+        mostrarToast("⚠️ Alguien acaba de guardar otro cambio a la vez. Hemos actualizado los datos — repite la acción, por favor.");
+        escribiendoRef.current = false;
+        return;
+      }
+      if (!resultado.ok) {
+        mostrarToast("⚠️ No se pudo guardar. Comprueba tu conexión e inténtalo de nuevo.");
+        escribiendoRef.current = false;
+        return;
+      }
+      setEstado(nuevo);
+      versionRef.current = resultado.version;
+      escribiendoRef.current = false;
+    })();
   }, []);
   const mostrarToast = (msg, snapshotParaDeshacer = null) => {
     setToast(msg);
