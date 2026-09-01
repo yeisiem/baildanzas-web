@@ -416,17 +416,16 @@ function Baildanzas() {
   const mostrarToast = (msg, snapshotParaDeshacer = null) => {
     setToast(msg);
     setSnapshotDeshacer(snapshotParaDeshacer);
-    setTimeout(() => {
-      setToast(null);
-      setSnapshotDeshacer(null);
-    }, 9600);
+  };
+  const cerrarToast = () => {
+    setToast(null);
+    setSnapshotDeshacer(null);
   };
   const deshacer = () => {
     if (!snapshotDeshacer) return;
     persistir(snapshotDeshacer);
     setSnapshotDeshacer(null);
     setToast("Cambio deshecho.");
-    setTimeout(() => setToast(null), 4e3);
   };
   if (cargando || !estado) {
     return /* @__PURE__ */ React.createElement("div", { style: { background: PAL.papel }, className: "min-h-screen flex items-center justify-center" }, /* @__PURE__ */ React.createElement("div", { style: { fontFamily: FONT.display, color: PAL.tinta }, className: "text-2xl italic animate-pulse" }, "Preparando el compás…"), /* @__PURE__ */ React.createElement(FontImport, null));
@@ -1017,7 +1016,7 @@ function Baildanzas() {
       onMarcarPropuestasVistas: marcarPropuestasVistas,
       onExportar: exportarCopiaSeguridad
     }
-  ), toast && /* @__PURE__ */ React.createElement(Toast, { mensaje: toast, onDeshacer: snapshotDeshacer ? deshacer : null }), alertaChoque && /* @__PURE__ */ React.createElement(AlertaChoque, { onReintentar: () => setAlertaChoque(false) }), errorCarga && /* @__PURE__ */ React.createElement(
+  ), toast && /* @__PURE__ */ React.createElement(Toast, { mensaje: toast, onDeshacer: snapshotDeshacer ? deshacer : null, onCerrar: cerrarToast }), alertaChoque && /* @__PURE__ */ React.createElement(AlertaChoque, { onReintentar: () => setAlertaChoque(false) }), errorCarga && /* @__PURE__ */ React.createElement(
     BannerError,
     {
       mensaje: "No se pudieron cargar los últimos cambios guardados. Puede que veas información desactualizada.",
@@ -2828,7 +2827,23 @@ function FilaPersona({ nombre, telefono, ts, onQuitar, tituloQuitar, onGuardarEd
       },
       (nombre || "?").trim().charAt(0).toUpperCase()
     ), /* @__PURE__ */ React.createElement("div", { className: "min-w-0" }, /* @__PURE__ */ React.createElement("div", { style: { color: PAL.tinta }, className: "text-sm font-medium truncate" }, nombre), /* @__PURE__ */ React.createElement("div", { style: { fontFamily: FONT.mono, color: PAL.tinta, opacity: 0.73 }, className: "text-[13px] truncate" }, telefono, ts && /* @__PURE__ */ React.createElement("span", { className: "opacity-70" }, " · ", formatearFechaHora(ts))))),
-    /* @__PURE__ */ React.createElement("div", { className: "flex items-center gap-0.5 shrink-0" }, onGuardarEdicion && /* @__PURE__ */ React.createElement("button", { onClick: () => setEditando(true), style: { color: PAL.morado, opacity: 0.8 }, className: "p-1.5", title: "Corregir nombre o teléfono" }, /* @__PURE__ */ React.createElement(Pencil, { size: 13 })), onQuitar && /* @__PURE__ */ React.createElement("button", { onClick: onQuitar, style: { color: PAL.carmin, opacity: 0.73 }, className: "p-1.5", title: tituloQuitar }, /* @__PURE__ */ React.createElement(Trash2, { size: 14 })))
+    /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8 }, className: "shrink-0" }, onGuardarEdicion && /* @__PURE__ */ React.createElement(
+      "button",
+      {
+        onClick: () => setEditando(true),
+        style: { color: PAL.morado, opacity: 0.85, padding: "8px 9px" },
+        title: "Corregir nombre o teléfono"
+      },
+      /* @__PURE__ */ React.createElement(Pencil, { size: 15 })
+    ), onGuardarEdicion && onQuitar && /* @__PURE__ */ React.createElement("div", { style: { width: 1, height: 22, background: PAL.linea } }), onQuitar && /* @__PURE__ */ React.createElement(
+      "button",
+      {
+        onClick: onQuitar,
+        style: { color: PAL.carmin, opacity: 0.8, padding: "8px 9px" },
+        title: tituloQuitar
+      },
+      /* @__PURE__ */ React.createElement(Trash2, { size: 16 })
+    ))
   );
 }
 function AlertaChoque({ onReintentar }) {
@@ -2923,23 +2938,59 @@ function AlertaChoque({ onReintentar }) {
     )
   );
 }
-function Toast({ mensaje, onDeshacer }) {
+function Toast({ mensaje, onDeshacer, onCerrar }) {
   return /* @__PURE__ */ React.createElement(
     "div",
     {
-      style: { background: PAL.tinta, color: PAL.papel, fontFamily: FONT.body },
-      className: "fixed bottom-6 left-1/2 -translate-x-1/2 px-5 py-3 rounded-full text-sm shadow-xl z-50 max-w-[90vw] flex items-center gap-3"
+      style: {
+        position: "fixed",
+        bottom: 24,
+        left: "50%",
+        transform: "translateX(-50%)",
+        background: PAL.tinta,
+        color: PAL.papel,
+        fontFamily: FONT.body,
+        zIndex: 90,
+        maxWidth: "92vw",
+        width: 340,
+        borderRadius: 16,
+        padding: "16px 18px",
+        boxShadow: "0 12px 30px -8px rgba(0,0,0,0.45)"
+      }
     },
-    /* @__PURE__ */ React.createElement("span", null, mensaje),
-    onDeshacer && /* @__PURE__ */ React.createElement(
+    /* @__PURE__ */ React.createElement("p", { style: { fontSize: 14.5, lineHeight: 1.45, marginBottom: 14 } }, mensaje),
+    /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 8 } }, onDeshacer && /* @__PURE__ */ React.createElement(
       "button",
       {
         onClick: onDeshacer,
-        style: { color: PAL.papel, textDecoration: "underline", fontWeight: 600 },
-        className: "shrink-0"
+        style: {
+          flex: 1,
+          background: PAL.papel,
+          color: PAL.tinta,
+          fontWeight: 700,
+          fontSize: 13.5,
+          padding: "9px 0",
+          borderRadius: 10
+        }
       },
       "Deshacer"
-    )
+    ), /* @__PURE__ */ React.createElement(
+      "button",
+      {
+        onClick: onCerrar,
+        style: {
+          flex: 1,
+          background: onDeshacer ? "transparent" : PAL.papel,
+          color: onDeshacer ? PAL.papel : PAL.tinta,
+          border: onDeshacer ? `1.5px solid ${PAL.papel}` : "none",
+          fontWeight: 700,
+          fontSize: 13.5,
+          padding: "9px 0",
+          borderRadius: 10
+        }
+      },
+      "Vale"
+    ))
   );
 }
 function BannerError({ mensaje, onRecargar, onCerrar }) {
