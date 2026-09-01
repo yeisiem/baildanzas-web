@@ -2349,6 +2349,11 @@ Gracias por confiar en nosotros, ¡nos vemos pronto! 💃`;
               nombre: al.nombre,
               telefono: al.telefono,
               ts: al.ts,
+              mensajeWhatsApp: `¡Hola ${al.nombre}!
+
+Te escribimos desde Baildanzas sobre tu clase de *${act.nivel ? `${act.nombre} · ${act.nivel}` : act.nombre}* (${d} a las ${h}).
+
+¡Nos vemos pronto! 💃`,
               onQuitar: () => onQuitarInteresado(act.id, idx),
               tituloQuitar: "Quitar de esta clase",
               onGuardarEdicion: (n, t) => onEditarInteresado(act.id, idx, "interesados", n, t)
@@ -2366,6 +2371,11 @@ Gracias por confiar en nosotros, ¡nos vemos pronto! 💃`;
               nombre: per.nombre,
               telefono: per.telefono,
               ts: per.ts,
+              mensajeWhatsApp: `¡Hola ${per.nombre}!
+
+Sigues en la lista de espera de *${act.nivel ? `${act.nombre} · ${act.nivel}` : act.nombre}* (${d} a las ${h}), en la posición ${idx + 1}.
+
+Te avisaremos en cuanto se libere un hueco. ¡Gracias por tu paciencia! 💃`,
               onQuitar: () => onQuitarInteresado(act.id, idx, "espera"),
               tituloQuitar: "Quitar de la lista de espera",
               onGuardarEdicion: (n, t) => onEditarInteresado(act.id, idx, "espera", n, t)
@@ -2493,6 +2503,11 @@ Gracias por confiar en nosotros, ¡nos vemos pronto! 💃`;
           nombre: persona.nombre,
           telefono: persona.telefono,
           ts: persona.ts,
+          mensajeWhatsApp: `¡Hola ${persona.nombre}!
+
+Gracias por proponer *${p.nombre}* en Baildanzas (${p.dia} a las ${p.hora}). De momento sois ${p.personas.length} — en cuanto lleguéis a 8, ¡la ponemos en marcha!
+
+¿Conoces a alguien más a quien le pueda interesar? Cuantas más seáis, antes arranca. 💃`,
           onQuitar: () => onQuitarInteresado(p.id, idx),
           tituloQuitar: "Dar de baja de esta propuesta",
           onGuardarEdicion: (n, t) => onEditarInteresado(p.id, idx, "interesados", n, t)
@@ -2653,7 +2668,20 @@ Gracias por confiar en Baildanzas 💃`;
         className: "flex-1 py-1.5 rounded-lg border text-xs font-medium"
       },
       "Cancelar"
-    ))), /* @__PURE__ */ React.createElement("div", { className: "mt-2" }, s.personas.map((c, i) => /* @__PURE__ */ React.createElement(FilaPersona, { key: i, nombre: c.nombre, telefono: c.telefono, ts: c.ts })))))),
+    ))), /* @__PURE__ */ React.createElement("div", { className: "mt-2" }, s.personas.map((c, i) => /* @__PURE__ */ React.createElement(
+      FilaPersona,
+      {
+        key: i,
+        nombre: c.nombre,
+        telefono: c.telefono,
+        ts: c.ts,
+        mensajeWhatsApp: `¡Hola ${c.nombre}!
+
+Hemos recibido tu propuesta de *${s.nombre}* en Baildanzas (${s.dia} a las ${s.hora}) y la estamos valorando.
+
+Te avisaremos en cuanto haya novedades. ¡Gracias por confiar en Baildanzas! 💃`
+      }
+    )))))),
     tab === "catalogo" && /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.7 }, className: "text-xs mb-3" }, "Estas son las actividades que la gente puede elegir al proponer algo en un hueco libre."), /* @__PURE__ */ React.createElement("div", { className: "flex gap-2 mb-4" }, /* @__PURE__ */ React.createElement(
       "input",
       {
@@ -2762,7 +2790,7 @@ function EditorDisponibilidad({ sede, onEditarDisponibilidad }) {
     )));
   })));
 }
-function FilaPersona({ nombre, telefono, ts, onQuitar, tituloQuitar, onGuardarEdicion }) {
+function FilaPersona({ nombre, telefono, ts, onQuitar, tituloQuitar, onGuardarEdicion, mensajeWhatsApp }) {
   const [editando, setEditando] = useState(false);
   const [n, setN] = useState(nombre);
   const [t, setT] = useState(telefono);
@@ -2826,7 +2854,18 @@ function FilaPersona({ nombre, telefono, ts, onQuitar, tituloQuitar, onGuardarEd
       },
       (nombre || "?").trim().charAt(0).toUpperCase()
     ), /* @__PURE__ */ React.createElement("div", { className: "min-w-0" }, /* @__PURE__ */ React.createElement("div", { style: { color: PAL.tinta }, className: "text-sm font-medium truncate" }, nombre), /* @__PURE__ */ React.createElement("div", { style: { fontFamily: FONT.mono, color: PAL.tinta, opacity: 0.73 }, className: "text-[13px] truncate" }, telefono, ts && /* @__PURE__ */ React.createElement("span", { className: "opacity-70" }, " · ", formatearFechaHora(ts))))),
-    /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8 }, className: "shrink-0" }, onGuardarEdicion && /* @__PURE__ */ React.createElement(
+    /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8 }, className: "shrink-0" }, mensajeWhatsApp && /* @__PURE__ */ React.createElement(
+      "a",
+      {
+        href: enlaceWhatsApp(telefono, mensajeWhatsApp),
+        target: "_blank",
+        rel: "noopener noreferrer",
+        style: { background: "#25D366", color: "white", padding: "7px 9px", borderRadius: 8 },
+        className: "flex items-center justify-center shrink-0",
+        title: "Enviar un WhatsApp"
+      },
+      /* @__PURE__ */ React.createElement(Phone, { size: 14 })
+    ), mensajeWhatsApp && (onGuardarEdicion || onQuitar) && /* @__PURE__ */ React.createElement("div", { style: { width: 1, height: 22, background: PAL.linea } }), onGuardarEdicion && /* @__PURE__ */ React.createElement(
       "button",
       {
         onClick: () => setEditando(true),
