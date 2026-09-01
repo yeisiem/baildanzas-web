@@ -357,6 +357,7 @@ function Baildanzas() {
   const [panelDesbloqueado, setPanelDesbloqueado] = useState(false);
   const [toast, setToast] = useState(null);
   const [snapshotDeshacer, setSnapshotDeshacer] = useState(null);
+  const [alertaChoque, setAlertaChoque] = useState(false);
   const [errorCarga, setErrorCarga] = useState(false);
   const escribiendoRef = useRef(false);
   const estadoRef = useRef(null);
@@ -398,7 +399,7 @@ function Baildanzas() {
           setEstado(normalizarEstado(fresco.datos));
           versionRef.current = fresco.version;
         }
-        mostrarToast("⚠️ Alguien acaba de guardar otro cambio a la vez. Hemos actualizado los datos — repite la acción, por favor.");
+        setAlertaChoque(true);
         escribiendoRef.current = false;
         return;
       }
@@ -1016,7 +1017,7 @@ function Baildanzas() {
       onMarcarPropuestasVistas: marcarPropuestasVistas,
       onExportar: exportarCopiaSeguridad
     }
-  ), toast && /* @__PURE__ */ React.createElement(Toast, { mensaje: toast, onDeshacer: snapshotDeshacer ? deshacer : null }), errorCarga && /* @__PURE__ */ React.createElement(
+  ), toast && /* @__PURE__ */ React.createElement(Toast, { mensaje: toast, onDeshacer: snapshotDeshacer ? deshacer : null }), alertaChoque && /* @__PURE__ */ React.createElement(AlertaChoque, { onReintentar: () => setAlertaChoque(false) }), errorCarga && /* @__PURE__ */ React.createElement(
     BannerError,
     {
       mensaje: "No se pudieron cargar los últimos cambios guardados. Puede que veas información desactualizada.",
@@ -2828,6 +2829,98 @@ function FilaPersona({ nombre, telefono, ts, onQuitar, tituloQuitar, onGuardarEd
       (nombre || "?").trim().charAt(0).toUpperCase()
     ), /* @__PURE__ */ React.createElement("div", { className: "min-w-0" }, /* @__PURE__ */ React.createElement("div", { style: { color: PAL.tinta }, className: "text-sm font-medium truncate" }, nombre), /* @__PURE__ */ React.createElement("div", { style: { fontFamily: FONT.mono, color: PAL.tinta, opacity: 0.73 }, className: "text-[13px] truncate" }, telefono, ts && /* @__PURE__ */ React.createElement("span", { className: "opacity-70" }, " · ", formatearFechaHora(ts))))),
     /* @__PURE__ */ React.createElement("div", { className: "flex items-center gap-0.5 shrink-0" }, onGuardarEdicion && /* @__PURE__ */ React.createElement("button", { onClick: () => setEditando(true), style: { color: PAL.morado, opacity: 0.8 }, className: "p-1.5", title: "Corregir nombre o teléfono" }, /* @__PURE__ */ React.createElement(Pencil, { size: 13 })), onQuitar && /* @__PURE__ */ React.createElement("button", { onClick: onQuitar, style: { color: PAL.carmin, opacity: 0.73 }, className: "p-1.5", title: tituloQuitar }, /* @__PURE__ */ React.createElement(Trash2, { size: 14 })))
+  );
+}
+function AlertaChoque({ onReintentar }) {
+  return /* @__PURE__ */ React.createElement(
+    "div",
+    {
+      style: {
+        position: "fixed",
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        background: "rgba(20,10,10,0.55)",
+        zIndex: 100,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: 24
+      }
+    },
+    /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        style: {
+          background: "linear-gradient(180deg, #B23A48 0%, #8E2A36 100%)",
+          width: "100%",
+          maxWidth: 360,
+          borderRadius: 20,
+          padding: 4
+        }
+      },
+      /* @__PURE__ */ React.createElement(
+        "div",
+        {
+          style: {
+            height: 10,
+            borderRadius: "16px 16px 0 0",
+            backgroundImage: "repeating-linear-gradient(135deg, #F5C842, #F5C842 12px, #241E31 12px, #241E31 24px)"
+          }
+        }
+      ),
+      /* @__PURE__ */ React.createElement(
+        "div",
+        {
+          style: {
+            background: PAL.blanco,
+            margin: "0 4px 4px",
+            borderRadius: "0 0 16px 16px",
+            padding: "28px 24px 24px",
+            textAlign: "center"
+          }
+        },
+        /* @__PURE__ */ React.createElement(
+          "div",
+          {
+            style: {
+              background: "#FDECEC",
+              border: "3px solid #B23A48",
+              width: 64,
+              height: 64,
+              margin: "0 auto 16px",
+              borderRadius: "50%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: 32
+            }
+          },
+          "⚠️"
+        ),
+        /* @__PURE__ */ React.createElement("div", { style: { color: "#8E2A36", fontFamily: FONT.display, fontSize: 21, fontWeight: 800, marginBottom: 10 } }, "Se ha producido un error"),
+        /* @__PURE__ */ React.createElement("p", { style: { color: "#3a2a2a", fontSize: 15, lineHeight: 1.55, marginBottom: 24 } }, "Alguien ha guardado un cambio justo a la vez que tú. Tu acción no se ha guardado."),
+        /* @__PURE__ */ React.createElement(
+          "button",
+          {
+            onClick: onReintentar,
+            style: {
+              background: "#B23A48",
+              boxShadow: "0 8px 20px -6px rgba(178,58,72,0.6)",
+              width: "100%",
+              color: "white",
+              fontWeight: 700,
+              fontSize: 16,
+              padding: "14px 0",
+              borderRadius: 12,
+              border: "none"
+            }
+          },
+          "Volver a intentar"
+        )
+      )
+    )
   );
 }
 function Toast({ mensaje, onDeshacer }) {
