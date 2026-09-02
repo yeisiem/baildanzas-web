@@ -47,8 +47,10 @@ function localizarActividad(estado, activityId) {
           return {
             sedeId: Number(sedeId),
             sedeNombre: sede.nombre,
+            sedeDireccion: sede.direccion,
             dia,
             hora,
+            sala: found.sala,
             nombre: found.nivel ? `${found.nombre} · ${found.nivel}` : found.nombre,
             tipo: "activa"
           };
@@ -58,7 +60,7 @@ function localizarActividad(estado, activityId) {
       for (const [hora, lista] of Object.entries(porHora)) {
         const found = lista.find((a) => a.id === activityId);
         if (found)
-          return { sedeId: Number(sedeId), sedeNombre: sede.nombre, dia, hora, nombre: found.nombre, tipo: "propuesta" };
+          return { sedeId: Number(sedeId), sedeNombre: sede.nombre, sedeDireccion: sede.direccion, dia, hora, sala: found.sala, nombre: found.nombre, tipo: "propuesta" };
       }
     }
   }
@@ -451,8 +453,10 @@ function Baildanzas() {
       confirmadas = personas.slice(0, huecosLibres);
       enEspera = personas.slice(huecosLibres);
     }
-    confirmadas.forEach((p) => nuevo.interesados[info.activityId].push({ ...p, ts: Date.now() }));
-    enEspera.forEach((p) => nuevo.listaEspera[info.activityId].push({ ...p, ts: Date.now() }));
+    confirmadas = confirmadas.map((p) => ({ ...p, ts: p.ts || Date.now() }));
+    enEspera = enEspera.map((p) => ({ ...p, ts: p.ts || Date.now() }));
+    confirmadas.forEach((p) => nuevo.interesados[info.activityId].push(p));
+    enEspera.forEach((p) => nuevo.listaEspera[info.activityId].push(p));
     if (confirmadas.length > 0) {
       notificar(nuevo, {
         id: uid(),
@@ -707,6 +711,26 @@ function Baildanzas() {
     const p = lista.find((x) => x.id === propuestaId);
     if (p) p.nombre = nuevoNombre.trim();
     persistir(nuevo);
+  };
+  const crearPropuestaGestor = (dia2, hora, sala, nombreActividad) => {
+    const nombreLimpio = nombreActividad.trim();
+    if (!nombreLimpio) return;
+    const nuevo = structuredClone(estado);
+    if (!nuevo.sedes[sedeId].propuestas[dia2]) nuevo.sedes[sedeId].propuestas[dia2] = {};
+    if (!nuevo.sedes[sedeId].propuestas[dia2][hora]) nuevo.sedes[sedeId].propuestas[dia2][hora] = [];
+    const propuestasDelHueco = nuevo.sedes[sedeId].propuestas[dia2][hora];
+    const existente = propuestasDelHueco.find(
+      (p) => p.nombre.trim().toLowerCase() === nombreLimpio.toLowerCase() && p.sala === sala
+    );
+    if (existente) {
+      mostrarToast(`Ya había una propuesta llamada "${existente.nombre}" en ese hueco — no se ha duplicado.`);
+      return;
+    }
+    const nuevaPropuesta = { id: uid(), nombre: nombreLimpio, sala: sala || void 0 };
+    propuestasDelHueco.push(nuevaPropuesta);
+    if (!nuevo.interesados[nuevaPropuesta.id]) nuevo.interesados[nuevaPropuesta.id] = [];
+    persistir(nuevo);
+    mostrarToast(`Propuesta "${nuevaPropuesta.nombre}" creada para ${dia2} a las ${hora}. Ya aparece en el calendario para que la gente se apunte.`);
   };
   const aprobarSugerencia = (sugerenciaId) => {
     const nuevo = structuredClone(estado);
@@ -996,6 +1020,7 @@ function Baildanzas() {
       onEditarClaseFija: editarClaseFija,
       onPromocionarDeEspera: promocionarDeEspera,
       onRenombrarPropuesta: renombrarPropuesta,
+      onCrearPropuestaGestor: crearPropuestaGestor,
       onRenombrarSede: renombrarSede,
       onEditarDireccionSede: editarDireccionSede,
       onBorrar: borrarActividadBase,
@@ -1767,6 +1792,7 @@ function PanelGestion({
   onEditarClaseFija,
   onPromocionarDeEspera,
   onRenombrarPropuesta,
+  onCrearPropuestaGestor,
   onRenombrarSede,
   onEditarDireccionSede,
   onBorrar,
@@ -1792,6 +1818,10 @@ function PanelGestion({
   const [nHoraFin, setNHoraFin] = useState("");
   const [nSala, setNSala] = useState(sede.salas ? sede.salas[0] : "");
   const [errorAnadirHorario, setErrorAnadirHorario] = useState("");
+  const [pDia, setPDia] = useState(DIAS[0]);
+  const [pHora, setPHora] = useState("");
+  const [pNombre, setPNombre] = useState("");
+  const [pSala, setPSala] = useState("Sala 1");
   const [nNombre, setNNombre] = useState("");
   const [nNivel, setNNivel] = useState("");
   const [nCupo, setNCupo] = useState("");
@@ -2126,7 +2156,7 @@ Gracias por confiar en nosotros, ¡nos vemos pronto! 💃`;
             className: "mt-2.5 pt-2.5 border-t flex items-center gap-1.5 flex-wrap"
           },
           /* @__PURE__ */ React.createElement("span", { style: { fontFamily: FONT.display, color: PAL.tinta }, className: "text-sm font-medium" }, r.nombre),
-          /* @__PURE__ */ React.createElement("span", { style: { color: PAL.tinta, opacity: 0.65 }, className: "text-xs" }, "· ", r.sedeNombre, " · ", r.dia, " ", r.hora),
+          /* @__PURE__ */ React.createElement("span", { style: { color: PAL.tinta, opacity: 0.65 }, className: "text-xs" }, "· ", r.sedeNombre, r.sedeDireccion ? ` (${r.sedeDireccion})` : "", " · ", r.dia, " ", r.hora, r.sala ? ` · ${r.sala}` : ""),
           /* @__PURE__ */ React.createElement(
             "span",
             {
@@ -2212,7 +2242,48 @@ Gracias por confiar en nosotros, ¡nos vemos pronto! 💃`;
         className: "w-full py-2.5 rounded-lg text-white text-sm"
       },
       "Añadir al horario"
-    ), errorAnadirHorario && /* @__PURE__ */ React.createElement("p", { style: { color: PAL.carmin }, className: "text-xs mt-2" }, errorAnadirHorario)), /* @__PURE__ */ React.createElement("div", { className: "space-y-2" }, diasSede.map((d) => {
+    ), errorAnadirHorario && /* @__PURE__ */ React.createElement("p", { style: { color: PAL.carmin }, className: "text-xs mt-2" }, errorAnadirHorario)), /* @__PURE__ */ React.createElement("div", { style: { background: PAL.blanco, border: `1.5px dashed ${PAL.mostaza}` }, className: "p-4 rounded-2xl mb-5" }, /* @__PURE__ */ React.createElement("div", { style: { fontFamily: FONT.mono, opacity: 0.7 }, className: "text-[13px] uppercase tracking-widest mb-1" }, "Crear propuesta como equipo"), /* @__PURE__ */ React.createElement("p", { style: { color: PAL.tinta, opacity: 0.65 }, className: "text-xs mb-3" }, "Se crea directamente pendiente de llegar a 8 personas, sin esperar a que la escriba un alumno. Si ya existiera una igual en ese hueco, se junta con ella en vez de duplicarla."), /* @__PURE__ */ React.createElement("div", { className: "grid grid-cols-2 gap-2 mb-2" }, /* @__PURE__ */ React.createElement("select", { value: pDia, onChange: (e) => setPDia(e.target.value), className: "px-3 py-2 rounded-lg border text-sm", style: { borderColor: PAL.linea } }, diasSede.map((d) => /* @__PURE__ */ React.createElement("option", { key: d }, d))), /* @__PURE__ */ React.createElement(
+      "input",
+      {
+        type: "time",
+        value: pHora,
+        onChange: (e) => setPHora(e.target.value),
+        className: "px-3 py-2 rounded-lg border text-sm",
+        style: { borderColor: PAL.linea }
+      }
+    )), sede.salas && /* @__PURE__ */ React.createElement(
+      "select",
+      {
+        value: pSala,
+        onChange: (e) => setPSala(e.target.value),
+        className: "w-full px-3 py-2 rounded-lg border text-sm mb-2",
+        style: { borderColor: PAL.linea }
+      },
+      sede.salas.map((s) => /* @__PURE__ */ React.createElement("option", { key: s }, s))
+    ), /* @__PURE__ */ React.createElement(
+      "input",
+      {
+        value: pNombre,
+        onChange: (e) => setPNombre(e.target.value),
+        placeholder: "Nombre de la actividad (ej: Singles Bailando)",
+        className: "w-full px-3 py-2 rounded-lg border text-sm mb-3",
+        style: { borderColor: PAL.linea }
+      }
+    ), /* @__PURE__ */ React.createElement(
+      "button",
+      {
+        onClick: () => {
+          if (!pNombre.trim() || !pHora) return;
+          onCrearPropuestaGestor(pDia, pHora, sede.salas ? pSala : void 0, pNombre);
+          setPNombre("");
+          setPHora("");
+        },
+        disabled: !pNombre.trim() || !pHora,
+        style: { background: PAL.morado, opacity: !pNombre.trim() || !pHora ? 0.45 : 1 },
+        className: "w-full py-2.5 rounded-lg text-white text-sm"
+      },
+      "Crear propuesta"
+    )), /* @__PURE__ */ React.createElement("div", { className: "space-y-2" }, diasSede.map((d) => {
       const horasDelDia = Object.keys(sede.activas[d] || {});
       if (horasDelDia.length === 0) return null;
       return /* @__PURE__ */ React.createElement("div", { key: d }, /* @__PURE__ */ React.createElement("div", { style: { fontFamily: FONT.mono, opacity: 0.7 }, className: "text-[13px] uppercase tracking-widest mt-3 mb-1" }, d), horasDelDia.sort().map(
