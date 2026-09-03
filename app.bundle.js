@@ -908,6 +908,30 @@ function Baildanzas() {
       personasTransferidas.length > 0 ? `¡Hecho! "${nombreActividad}" ya es una clase activa, con ${personasTransferidas.length} alumnos ya apuntados.` : `¡Hecho! "${nombreActividad}" ya es una clase activa los ${dia2.toLowerCase()} a las ${hora}.`
     );
   };
+  const volverAPropuesta = (dia2, hora, activityId) => {
+    const nuevo = structuredClone(estado);
+    const lista = nuevo.sedes[sedeId].activas[dia2]?.[hora] || [];
+    const idx = lista.findIndex((a) => a.id === activityId);
+    if (idx === -1) return;
+    const act = lista[idx];
+    lista.splice(idx, 1);
+    const nombreCompleto = act.nivel ? `${act.nombre} · ${act.nivel}` : act.nombre;
+    const personas = [
+      ...(nuevo.interesados[activityId] || []),
+      ...(nuevo.listaEspera[activityId] || [])
+    ];
+    delete nuevo.interesados[activityId];
+    delete nuevo.listaEspera[activityId];
+    if (!nuevo.sedes[sedeId].propuestas[dia2]) nuevo.sedes[sedeId].propuestas[dia2] = {};
+    if (!nuevo.sedes[sedeId].propuestas[dia2][hora]) nuevo.sedes[sedeId].propuestas[dia2][hora] = [];
+    const nuevaPropuestaId = uid();
+    nuevo.sedes[sedeId].propuestas[dia2][hora].push({ id: nuevaPropuestaId, nombre: nombreCompleto, sala: act.sala || void 0 });
+    nuevo.interesados[nuevaPropuestaId] = personas;
+    persistir(nuevo);
+    mostrarToast(
+      personas.length > 0 ? `Hecho. "${nombreCompleto}" vuelve a ser una propuesta, con ${personas.length} persona${personas.length > 1 ? "s" : ""} ya apuntada${personas.length > 1 ? "s" : ""} (sois ${personas.length} de ${UMBRAL_PROPUESTA} para que vuelva a arrancar).` : `Hecho. "${nombreCompleto}" vuelve a ser una propuesta.`
+    );
+  };
   const anadirAlumnoActiva = (dia2, hora, activityId, nombre, telefono) => {
     const nuevo = structuredClone(estado);
     if (!nuevo.interesados[activityId]) nuevo.interesados[activityId] = [];
@@ -1033,6 +1057,7 @@ function Baildanzas() {
       onEditarInteresado: editarInteresado,
       onFusionarPropuestas: fusionarPropuestas,
       onConvertirEnActiva: convertirEnClaseActiva,
+      onVolverAPropuesta: volverAPropuesta,
       onAnadirAlumno: anadirAlumnoActiva,
       interesados: estado.interesados,
       listaEspera: estado.listaEspera,
@@ -1805,6 +1830,7 @@ function PanelGestion({
   onEditarInteresado,
   onFusionarPropuestas,
   onConvertirEnActiva,
+  onVolverAPropuesta,
   onAnadirAlumno,
   vistoPropuestasTs,
   onMarcarPropuestasVistas,
@@ -2413,6 +2439,20 @@ Gracias por confiar en nosotros, ¡nos vemos pronto! 💃`;
               title: "Marca esta clase como completa a mano, sin importar cuántas plazas queden libres de verdad"
             },
             act.forzarCompleto ? /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement(Check, { size: 13 }), " Marcada como completa a mano — pulsa para reactivarla") : "Marcar como completa a mano"
+          ), /* @__PURE__ */ React.createElement(
+            "button",
+            {
+              onClick: () => {
+                if (window.confirm(`¿Volver a convertir "${act.nivel ? `${act.nombre} · ${act.nivel}` : act.nombre}" en propuesta? El alumnado ya apuntado se mantiene, pero la clase dejará de estar activa hasta llegar de nuevo a ${UMBRAL_PROPUESTA} personas.`)) {
+                  onVolverAPropuesta(d, h, act.id);
+                }
+              },
+              style: { borderColor: PAL.mostaza, color: PAL.tinta },
+              className: "w-full flex items-center justify-center gap-1.5 py-1.5 rounded-lg border text-xs font-medium mb-2",
+              title: "Convierte esta clase activa de nuevo en propuesta, conservando el alumnado ya apuntado"
+            },
+            /* @__PURE__ */ React.createElement(ChevronLeft, { size: 13 }),
+            " Volver a convertir en propuesta"
           ), alumnos.length > 0 ? /* @__PURE__ */ React.createElement("div", { style: { background: PAL.blanco, border: `1px solid ${PAL.linea}` }, className: "rounded-lg px-2 mb-2" }, alumnos.map((al, idx) => /* @__PURE__ */ React.createElement(
             FilaPersona,
             {
